@@ -1,6 +1,7 @@
 const express = require("express")
 const db = require("./config/db")
 const authRoutes = require("./routes/authRoutes")
+const productsRoutes = require("./routes/productsRoutes")
 
 const app = express()
 
@@ -11,6 +12,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/auth", authRoutes)
+app.use("/api", productsRoutes)
 
 db.connect((err) => {
     if (err) {
