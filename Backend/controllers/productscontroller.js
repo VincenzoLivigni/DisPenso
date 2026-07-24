@@ -1,14 +1,14 @@
 const db = require("../config/db")
 
 exports.create = async (req, res) => {
-    const { barcode, user_id } = req.body;
+    const userId = req.user.id;
+    const { barcode } = req.body;
 
     if (!barcode) {
         return res.status(400).json({ message: "Codice a barre obbligatorio" });
     }
 
     try {
-        // Chiamata all'API di Open Food Facts
         const offResponse = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`, {
             headers: {
                 'User-Agent': 'DisPensoApp - Web/Mobile - Version 0.1'
@@ -20,31 +20,41 @@ exports.create = async (req, res) => {
         let name = "Prodotto sconosciuto";
         let brand = null;
         let image_url = null;
+        let category = null;
+        let ingredients = null;
+        let source = "open_food_facts";
 
-        // Se Open Food Facts trova il prodotto, estraiamo i dati principali
         if (data.status === 1) {
             const offProduct = data.product;
             name = offProduct.product_name_it || offProduct.product_name || name;
             brand = offProduct.brands || null;
             image_url = offProduct.image_front_small_url || offProduct.image_url || null;
+            category = offProduct.categories || null;
+            ingredients = offProduct.ingredients_text_it || offProduct.ingredients_text || null;
         }
 
-        // Salvataggio nel DB MySQL
-        const query = `INSERT INTO products (barcode, name, brand, image_url, user_id) VALUES (?, ?, ?, ?, ?)`;
+        const query = `
+            INSERT INTO products 
+            (user_id, barcode, name, brand, image_url, category, ingredients, source)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
 
         db.query(
             query,
             [
+                userId,
                 barcode,
                 name,
                 brand,
                 image_url,
-                user_id || null
+                category,
+                ingredients,
+                source
             ],
             (error, result) => {
                 if (error) {
                     console.error("Errore salvataggio prodotto nel DB:", error);
-                    return res.status(500).json({ message: "Errore durante il salvataggio nel database" });
+                    return res.status(500).json({ message: "Errore durante il salvataggio nel database", error: error.message });
                 }
 
                 res.status(201).json({
@@ -55,6 +65,9 @@ exports.create = async (req, res) => {
                         name,
                         brand,
                         image_url,
+                        category,
+                        ingredients,
+                        source
                     }
                 });
             }
@@ -66,11 +79,11 @@ exports.create = async (req, res) => {
     }
 };
 
-// 2. GET ALL: Mostra tutti i prodotti presente nel DB MySQL
 exports.getAll = (req, res) => {
-    const query = "SELECT * FROM products ORDER BY id DESC";
+    const userId = req.user.id;
+    const query = "SELECT * FROM products WHERE user_id = ? ORDER BY id DESC";
 
-    db.query(query, (error, results) => {
+    db.query(query, [userId], (error, results) => {
         if (error) {
             console.error("Errore recupero prodotti:", error);
             return res.status(500).json({ message: "Errore durante il recupero dei prodotti" });
@@ -80,13 +93,13 @@ exports.getAll = (req, res) => {
     });
 };
 
-// 3. DELETE: Rimuove un prodotto tramite il suo ID nel DB
 exports.delete = (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
 
-    const query = "DELETE FROM products WHERE id = ?";
+    const query = "DELETE FROM products WHERE id = ? AND user_id = ?";
 
-    db.query(query, [id], (error, result) => {
+    db.query(query, [id, userId], (error, result) => {
         if (error) {
             console.error("Errore eliminazione prodotto:", error);
             return res.status(500).json({ message: "Errore durante l'eliminazione del prodotto" });
