@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api", pantryItemsRoutes)
 
-db.connect((err) => {
+db.connection.connect((err) => {
     if (err) {
         console.log("Connessione al database fallita")
         return
