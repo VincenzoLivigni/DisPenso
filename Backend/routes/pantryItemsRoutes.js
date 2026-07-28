@@ -12,6 +12,8 @@ router.get("/pantries/:pantryId/items", authMiddleware, pantryItemsController.ge
 router.get("/pantries/:pantryId/expiring", authMiddleware, pantryItemsController.expiringItems);
 //reduceQuantityItem
 router.patch("/pantries/:pantryId/items/:itemId/consume", authMiddleware, pantryItemsController.reduceQuantityItem);
+//update item
+router.patch("/pantries/:pantryId/items/:itemId", authMiddleware, pantryItemsController.updateItem);
 //delete
 router.delete("/pantries/:pantryId/items/:itemId", authMiddleware, pantryItemsController.deletePantryItem)
 

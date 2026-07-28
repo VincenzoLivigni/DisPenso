@@ -200,7 +200,6 @@ exports.expiringItems = async (req, res) => {
 }
 
 // MODIFICA QUANTITà
-
 exports.reduceQuantityItem = async (req, res) => {
     const { pantryId, itemId } = req.params
 
@@ -248,6 +247,50 @@ exports.reduceQuantityItem = async (req, res) => {
     catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Errore nell'aggiornamento della quantità dei prodotti" })
+    }
+}
+
+//MODIFICA MANUALE SCADENZA E QUANTITA'
+exports.updateItem = async (req, res) => {
+    const { pantryId, itemId } = req.params
+    const { quantity, expiration_date } = req.body
+
+    if (quantity !== undefined && quantity <= 0) {
+        return res.status(400).json({ message: 'La quantità deve essere maggiore di 0' })
+    }
+
+    try {
+        //Verifico che il prodotto esiste
+        const [items] = await db.query(
+            'SELECT * FROM pantry_items WHERE id = ? AND pantry_id = ?',
+            [itemId, pantryId]
+        )
+
+        if (items.length === 0) {
+            return res.status(404).json({ message: 'Prodotto non trovato' })
+        }
+
+        //constante con i vecchi valori
+        const newQuantity = quantity !== undefined ? quantity : items[0].quantity
+        const newExpirationDate = expiration_date !== undefined ? expiration_date : items[0].expiration_date
+
+        await db.query(
+            'UPDATE pantry_items SET quantity = ?, expiration_date = ? WHERE id = ? AND pantry_id = ?',
+            [newQuantity, newExpirationDate, itemId, pantryId]
+        )
+
+        return res.status(200).json({
+            message: 'prodotto aggiornato con successo',
+            item: {
+                id: itemId,
+                quantity: newQuantity,
+                expiration_date: newExpirationDate
+            }
+        })
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Errore durante la modifica del prodotto" })
     }
 }
 
