@@ -199,6 +199,58 @@ exports.expiringItems = async (req, res) => {
 
 }
 
+// MODIFICA QUANTITà
+
+exports.reduceQuantityItem = async (req, res) => {
+    const { pantryId, itemId } = req.params
+
+    try {
+        const [items] = await db.query(
+            "SELECT quantity FROM pantry_items WHERE id = ? AND pantry_id = ?",
+            [itemId, pantryId]
+        )
+
+        // se la quantità è 0
+        if (items.length === 0) {
+            return res.status(404).json({
+                message: "Articolo terminato"
+            })
+        }
+
+        const currentQuantity = items[0].quantity
+
+        // se la quantità è 1
+        if (currentQuantity <= 1) {
+            await db.query(
+                "DELETE FROM pantry_items WHERE id = ? AND pantry_id = ?",
+                [itemId, pantryId]
+            )
+
+            return res.status(200).json({
+                message: "Articolo consumato ed eliminato dalla dispensa",
+                remainingQuantity: 0
+            })
+        }
+
+        // decrementa la quantità del prodotto di 1
+        const newQuantity = currentQuantity - 1
+
+        await db.query(
+            "UPDATE pantry_items SET quantity = ? WHERE id = ? AND pantry_id = ?",
+            [newQuantity, itemId, pantryId]
+        )
+
+        return res.status(200).json({
+            message: "Quantità aggiornata con successo",
+            remainingQuantity: newQuantity
+        })
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Errore nell'aggiornamento della quantità dei prodotti" })
+    }
+}
+
 // ELIMINO PRODOTTO
 exports.deletePantryItem = async (req, res) => {
     const userId = req.user.id
