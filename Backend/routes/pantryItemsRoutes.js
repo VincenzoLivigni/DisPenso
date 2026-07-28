@@ -8,6 +8,8 @@ const pantryItemsController = require("../controllers/pantryItemsController")
 router.post("/pantries/:pantryId/items", authMiddleware, pantryItemsController.createPantryItem);
 //index
 router.get("/pantries/:pantryId/items", authMiddleware, pantryItemsController.getAllPantryItems);
+//expiring
+router.get("/pantries/:pantryId/expiring", authMiddleware, pantryItemsController.expiringItems);
 //delete
 router.delete("/pantries/:pantryId/items/:itemId", authMiddleware, pantryItemsController.deletePantryItem)
 

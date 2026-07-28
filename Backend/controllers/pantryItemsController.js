@@ -158,6 +158,47 @@ exports.getAllPantryItems = async (req, res) => {
     }
 }
 
+//SCADENZE PRODOTTI
+exports.expiringItems = async (req, res) => {
+    const { pantryId } = req.params
+
+    const days = parseInt(req.query.days) || 7
+
+    try {
+
+        const [items] = await db.query(`
+                SELECT
+                    pantryItem.id AS pantry_item_id,
+                    pantryItem.quantity,
+                    pantryItem.expiration_date,
+                    product.barcode,
+                    product.name,
+                    product.brand,
+                    product.image_url,
+                    
+                DATEDIFF (pantryItem.expiration_date, CURDATE()) AS days_remaining
+                FROM pantry_items AS pantryItem
+                JOIN products product ON pantryItem.product_id = product.id
+                WHERE pantryItem.pantry_id = ?
+                AND pantryItem.expiration_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
+                ORDER BY pantryItem.expiration_date ASC`,
+            [pantryId, days]
+        );
+
+        return res.status(200).json({
+            count: items.length,
+            filter_days: days,
+            items: items
+        })
+
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Errore nel recuperare le scadenze prodotti" })
+    }
+
+}
+
 // ELIMINO PRODOTTO
 exports.deletePantryItem = async (req, res) => {
     const userId = req.user.id
