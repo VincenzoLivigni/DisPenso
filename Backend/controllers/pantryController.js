@@ -13,6 +13,7 @@ exports.createPantry = async (req, res) => {
         // Genera un codice casuale di 5 numeri
         const inviteCode = Math.floor(10000 + Math.random() * 90000).toString();
 
+        // Inserisce la nuova dispensa nel db
         const [pantryRes] = await db.query(
             "INSERT INTO pantries (name, created_by, invite_code) VALUES (?, ?, ?)",
             [name, userId, inviteCode]
@@ -41,11 +42,13 @@ exports.joinPantryRequest = async (req, res) => {
     const userId = req.user.id;
     const { invite_code } = req.body;
 
+    // Controlla la presenza del codice d'invito
     if (!invite_code) {
         return res.status(400).json({ message: "Codice di invito obbligatorio" });
     }
 
     try {
+        // Cerca la dispensa associata al codice d'invito
         const [pantry] = await db.query(
             "SELECT id FROM pantries WHERE invite_code = ?",
             [invite_code]
@@ -96,6 +99,7 @@ exports.acceptMember = async (req, res) => {
             return res.status(403).json({ message: "Solo il creatore può accettare nuovi membri" });
         }
 
+        // Aggiorna lo stato della richiesta dell'utente da 'pending' ad 'accepted'
         const [result] = await db.query(
             "UPDATE pantry_users SET status = 'accepted' WHERE user_id = ? AND pantry_id = ? AND status = 'pending'",
             [targetUserId, pantryId]
@@ -112,16 +116,23 @@ exports.acceptMember = async (req, res) => {
     }
 };
 
-// RECUPERA TUTTE LE DISPENSE (In cui si è accettati)
+// RECUPERA TUTTE LE DISPENSE
 exports.getUserPantries = async (req, res) => {
     const userId = req.user.id;
 
     try {
         const [pantries] = await db.query(
-            `SELECT p.id, p.name, p.invite_code, p.created_at, pu.role, pu.status 
-             FROM pantries p
-             JOIN pantry_users pu ON p.id = pu.pantry_id
-             WHERE pu.user_id = ?`,
+            `SELECT 
+            pantries.id,
+            pantries.name,
+            pantries.invite_code,
+            pantries.created_at,
+            pantry_users.role,
+            pantry_users.status 
+            
+            FROM pantries
+            JOIN pantry_users ON pantries.id = pantry_users.pantry_id
+            WHERE pantry_users.user_id = ?`,
             [userId]
         );
 
@@ -149,10 +160,15 @@ exports.getPantryMembers = async (req, res) => {
         }
 
         const [members] = await db.query(
-            `SELECT u.id, u.email, pu.role, pu.status
-            FROM users u
-            JOIN pantry_users pu ON u.id = pu.user_id
-            WHERE pu.pantry_id = ?`,
+            `SELECT 
+            users.id, 
+            users.email, 
+            pantry_users.role, 
+            pantry_users.status
+
+            FROM users 
+            JOIN pantry_users ON users.id = pantry_users.user_id
+            WHERE pantry_users.pantry_id = ?`,
             [pantryId]
         );
 
@@ -168,11 +184,11 @@ exports.removeOrLeavePantry = async (req, res) => {
     const reqUserId = req.user.id;
     const { pantryId, targetUserId } = req.params;
 
-
+    // Con targetUserId viene rimosso un membro, altrimenti viene rimosso l'owner
     const userToRemove = targetUserId ? parseInt(targetUserId) : reqUserId;
 
     try {
-
+        // Verifichiamo che solo l'owner può rimuovere membri
         if (userToRemove !== reqUserId) {
             const [ownerCheck] = await db.query(
                 "SELECT role FROM pantry_users WHERE user_id = ? AND pantry_id = ? AND role = 'owner'",
@@ -185,11 +201,13 @@ exports.removeOrLeavePantry = async (req, res) => {
         }
 
 
+        // Verifica il ruolo dell'utente da rimuovere
         const [targetCheck] = await db.query(
             "SELECT role FROM pantry_users WHERE user_id = ? AND pantry_id = ?",
             [userToRemove, pantryId]
         );
 
+        // Se l'owner decide di abbandonare la dispensa, si cancella la dispensa intera
         if (targetCheck.length > 0 && targetCheck[0].role === 'owner' && userToRemove === reqUserId) {
             await db.query("DELETE FROM pantries WHERE id = ?", [pantryId]);
             return res.status(200).json({ message: "Dispensa eliminata poiché il creatore ha abbandonato" });
@@ -213,4 +231,4 @@ exports.removeOrLeavePantry = async (req, res) => {
         console.error(err);
         return res.status(500).json({ message: "Errore durante la rimozione dalla dispensa" });
     }
-};
+}
