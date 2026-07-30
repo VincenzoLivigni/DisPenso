@@ -2,6 +2,7 @@ const express = require("express")
 const db = require("./config/db")
 const authRoutes = require("./routes/authRoutes")
 const pantryItemsRoutes = require("./routes/pantryItemsRoutes")
+const pantryRoutes = require("./routes/pantryRoutes");
 
 const app = express()
 
@@ -12,6 +13,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/auth", authRoutes)
+app.use("/api", pantryRoutes);
 app.use("/api", pantryItemsRoutes)
 
 db.connection.connect((err) => {

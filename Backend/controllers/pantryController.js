@@ -1,0 +1,216 @@
+const db = require("../config/db");
+
+// CREA DISPENSA
+exports.createPantry = async (req, res) => {
+    const userId = req.user.id;
+    const { name } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ message: "Il nome della dispensa è obbligatorio" });
+    }
+
+    try {
+        // Genera un codice casuale di 5 numeri
+        const inviteCode = Math.floor(10000 + Math.random() * 90000).toString();
+
+        const [pantryRes] = await db.query(
+            "INSERT INTO pantries (name, created_by, invite_code) VALUES (?, ?, ?)",
+            [name, userId, inviteCode]
+        );
+        const pantryId = pantryRes.insertId;
+
+        // Aggiunge il creatore come owner e con status accettato
+        await db.query(
+            "INSERT INTO pantry_users (user_id, pantry_id, role, status) VALUES (?, ?, ?, ?)",
+            [userId, pantryId, "owner", "accepted"]
+        );
+
+        return res.status(201).json({
+            message: "Dispensa creata con successo",
+            pantryId: pantryId,
+            inviteCode: inviteCode
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Errore durante la creazione della dispensa" });
+    }
+};
+
+// RICHIEDI UNIONE TRAMITE CODICE
+exports.joinPantryRequest = async (req, res) => {
+    const userId = req.user.id;
+    const { invite_code } = req.body;
+
+    if (!invite_code) {
+        return res.status(400).json({ message: "Codice di invito obbligatorio" });
+    }
+
+    try {
+        const [pantry] = await db.query(
+            "SELECT id FROM pantries WHERE invite_code = ?",
+            [invite_code]
+        );
+
+        if (pantry.length === 0) {
+            return res.status(404).json({ message: "Dispensa non trovata con questo codice" });
+        }
+
+        const pantryId = pantry[0].id;
+
+        // Verifica se l'utente è già membro o ha già una richiesta in sospeso
+        const [existing] = await db.query(
+            "SELECT * FROM pantry_users WHERE user_id = ? AND pantry_id = ?",
+            [userId, pantryId]
+        );
+
+        if (existing.length > 0) {
+            return res.status(400).json({ message: "Fai già parte di questa dispensa o hai una richiesta in attesa" });
+        }
+
+        // Inserisce l'utente con status 'pending'
+        await db.query(
+            "INSERT INTO pantry_users (user_id, pantry_id, role, status) VALUES (?, ?, ?, ?)",
+            [userId, pantryId, "member", "pending"]
+        );
+
+        return res.status(200).json({ message: "Richiesta inviata. Attendi che il creatore accetti." });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Errore durante la richiesta di unione" });
+    }
+};
+
+// ACCETTA MEMBRO (Solo per l'owner)
+exports.acceptMember = async (req, res) => {
+    const ownerId = req.user.id;
+    const { pantryId, targetUserId } = req.params;
+
+    try {
+        // Verifica che chi sta effettuando l'azione sia effettivamente l'owner
+        const [ownerCheck] = await db.query(
+            "SELECT role FROM pantry_users WHERE user_id = ? AND pantry_id = ? AND role = 'owner'",
+            [ownerId, pantryId]
+        );
+
+        if (ownerCheck.length === 0) {
+            return res.status(403).json({ message: "Solo il creatore può accettare nuovi membri" });
+        }
+
+        const [result] = await db.query(
+            "UPDATE pantry_users SET status = 'accepted' WHERE user_id = ? AND pantry_id = ? AND status = 'pending'",
+            [targetUserId, pantryId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Nessuna richiesta in attesa trovata per questo utente" });
+        }
+
+        return res.status(200).json({ message: "Utente accettato nella dispensa" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Errore durante l'accettazione dell'utente" });
+    }
+};
+
+// RECUPERA TUTTE LE DISPENSE (In cui si è accettati)
+exports.getUserPantries = async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const [pantries] = await db.query(
+            `SELECT p.id, p.name, p.invite_code, p.created_at, pu.role, pu.status 
+             FROM pantries p
+             JOIN pantry_users pu ON p.id = pu.pantry_id
+             WHERE pu.user_id = ?`,
+            [userId]
+        );
+
+        return res.status(200).json(pantries);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Errore nel recupero delle dispense" });
+    }
+};
+
+// RECUPERA I MEMBRI DI UNA DISPENSA SPECIFICA
+exports.getPantryMembers = async (req, res) => {
+    const userId = req.user.id;
+    const { pantryId } = req.params;
+
+    try {
+        // Verifica che chi fa la richiesta faccia parte della dispensa
+        const [accessVerify] = await db.query(
+            "SELECT * FROM pantry_users WHERE user_id = ? AND pantry_id = ? AND status = 'accepted'",
+            [userId, pantryId]
+        );
+
+        if (accessVerify.length === 0) {
+            return res.status(403).json({ message: "Non hai i permessi per accedere a questa dispensa" });
+        }
+
+        const [members] = await db.query(
+            `SELECT u.id, u.email, pu.role, pu.status
+            FROM users u
+            JOIN pantry_users pu ON u.id = pu.user_id
+            WHERE pu.pantry_id = ?`,
+            [pantryId]
+        );
+
+        return res.status(200).json(members);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Errore nel recupero dei membri della dispensa" });
+    }
+};
+
+// ABBANDONA O RIMUOVI DALLA DISPENSA
+exports.removeOrLeavePantry = async (req, res) => {
+    const reqUserId = req.user.id;
+    const { pantryId, targetUserId } = req.params;
+
+
+    const userToRemove = targetUserId ? parseInt(targetUserId) : reqUserId;
+
+    try {
+
+        if (userToRemove !== reqUserId) {
+            const [ownerCheck] = await db.query(
+                "SELECT role FROM pantry_users WHERE user_id = ? AND pantry_id = ? AND role = 'owner'",
+                [reqUserId, pantryId]
+            );
+
+            if (ownerCheck.length === 0) {
+                return res.status(403).json({ message: "Solo l'owner può rimuovere altri membri" });
+            }
+        }
+
+
+        const [targetCheck] = await db.query(
+            "SELECT role FROM pantry_users WHERE user_id = ? AND pantry_id = ?",
+            [userToRemove, pantryId]
+        );
+
+        if (targetCheck.length > 0 && targetCheck[0].role === 'owner' && userToRemove === reqUserId) {
+            await db.query("DELETE FROM pantries WHERE id = ?", [pantryId]);
+            return res.status(200).json({ message: "Dispensa eliminata poiché il creatore ha abbandonato" });
+        }
+
+        // Rimuove l'utente (o se stesso)
+        const [result] = await db.query(
+            "DELETE FROM pantry_users WHERE user_id = ? AND pantry_id = ?",
+            [userToRemove, pantryId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Utente non trovato in questa dispensa" });
+        }
+
+        return res.status(200).json({
+            message: userToRemove === reqUserId ? "Hai abbandonato la dispensa" : "Membro rimosso con successo"
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Errore durante la rimozione dalla dispensa" });
+    }
+};

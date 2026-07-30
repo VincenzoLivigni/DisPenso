@@ -18,22 +18,9 @@ exports.register = async (req, res) => {
         )
         const userId = userRes.insertId
 
-
-        const [pantryRes] = await db.query(
-            "INSERT INTO pantries (name, created_by) VALUES (?,?)",
-            ["Dispensa personale", userId]
-        )
-        const pantryId = pantryRes.insertId
-
-        await db.query(
-            "INSERT INTO pantry_users (user_id, pantry_id, role) VALUES (?,?,?)",
-            [userId, pantryId, "owner"]
-        )
-
         return res.status(201).json({
-            message: "Utente registrato e dispensa personale creata con successo",
-            userId: userId,
-            pantryId: pantryId
+            message: "Utente registrato con successo. Crea o unisciti a una dispensa per iniziare.",
+            userId: userId
         })
     }
     catch (err) {
@@ -41,7 +28,6 @@ exports.register = async (req, res) => {
         return res.status(500).json({ message: "Errore durante la registrazione" })
     }
 }
-
 
 exports.login = async (req, res) => {
     const { email, password } = req.body
