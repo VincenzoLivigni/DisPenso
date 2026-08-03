@@ -174,7 +174,7 @@ exports.expiringItems = async (req, res) => {
                     product.barcode,
                     product.name,
                     product.brand,
-                    product.image_url
+                    product.image_url,
                     
                 DATEDIFF (pantryItem.expiration_date, CURDATE()) AS days_remaining
                 FROM pantry_items AS pantryItem
