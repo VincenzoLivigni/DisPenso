@@ -1,6 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 
+
+
 export default function Home() {
   return (
     <View style={styles.container}>
@@ -14,6 +16,12 @@ export default function Home() {
       <Link href="/prodotto/42" style={styles.bottone}>
         Apri Ricetta 42 (Tiramisù)
       </Link>
+      
+     <Link href="Register" style={styles.bottone}>
+        fai la registrazione
+      </Link>
+      
+
     </View>
   );
 }

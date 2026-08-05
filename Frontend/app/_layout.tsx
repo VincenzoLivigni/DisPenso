@@ -13,6 +13,10 @@ export default function RootLayout() {
         name="prodotto/[id]" 
         options={{ title: 'Dettaglio Prodotto' }} 
       />
+      <Stack.Screen
+      name="Register"
+      options={{title: 'Pagina Di Registrazione'}}
+      />
     </Stack>
   );
 }
