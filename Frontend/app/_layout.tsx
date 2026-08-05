@@ -1,25 +1,24 @@
-import "../global.css"
+import "../global.css";
 import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   return (
-    // Stack gestisce automaticamente le transizioni native tra le pagine
     <Stack>
       <Stack.Screen
+        name="Login"
+        options={{ title: 'Accesso', headerShown: false }}
+      />
+      <Stack.Screen
+        name="Register"
+        options={{ title: 'Registrazione', headerShown: false }}
+      />
+      <Stack.Screen
         name="index"
-        options={{ title: 'Dispenso Home' }}
+        options={{ title: 'DisPenso Dashboard' }}
       />
       <Stack.Screen
         name="prodotto/[id]"
         options={{ title: 'Dettaglio Prodotto' }}
-      />
-      <Stack.Screen
-        name="Register"
-        options={{ title: 'Pagina Di Registrazione' }}
-      />
-      <Stack.Screen
-        name="Login"
-        options={{ title: 'Pagina Di Accesso' }}
       />
     </Stack>
   );

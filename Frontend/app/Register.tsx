@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { TextInput, Text, View, Pressable, Alert, ActivityIndicator } from "react-native";
+import { useRouter } from "expo-router";
 
 const API = process.env.EXPO_PUBLIC_API_URL ? process.env.EXPO_PUBLIC_API_URL.trim() : ""
 
 export default function Register() {
+    const router = useRouter();
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -108,6 +110,9 @@ export default function Register() {
                 )}
             </Pressable>
 
+            <Pressable onPress={() => router.push("/Login")}>
+                <Text>Sei già registrato? Accedi</Text>
+            </Pressable>
         </View>
     )
 }
