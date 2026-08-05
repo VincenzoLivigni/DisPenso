@@ -42,4 +42,4 @@ yarn-error.*
 
 
 # Variabili personali tipo URL
-#.env
+.env

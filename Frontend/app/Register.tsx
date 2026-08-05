@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { TextInput, Text, View, Pressable, Alert, ActivityIndicator } from "react-native";
 
-export default function Register() {
+const API = process.env.EXPO_PUBLIC_API_URL ? process.env.EXPO_PUBLIC_API_URL.trim() : ""
 
-    const API = "http://localhost:3000/api"
+export default function Register() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -52,11 +52,15 @@ export default function Register() {
                 throw new Error(data.message || "Errore durante la registrazione")
             }
 
+            setEmail("");
+            setPassword("");
+            setErrors({});
+
             Alert.alert("Registrazione completata correttamente!");
         }
         catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "Errore durante la registrazione";
-            Alert.alert(errorMessage);
+            Alert.alert(errorMessage)
         }
         finally {
             setLoading(false)

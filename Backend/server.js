@@ -1,29 +1,22 @@
 const express = require("express")
-const db = require("./config/db")
+const cors = require("cors");
 const authRoutes = require("./routes/authRoutes")
 const pantryItemsRoutes = require("./routes/pantryItemsRoutes")
 const pantryRoutes = require("./routes/pantryRoutes");
 
 const app = express()
 
+app.use(cors());
 app.use(express.json())
 
 app.get("/", (req, res) => {
     res.send("DisPenso backend attivo!")
 })
 
-app.use("/api/auth", authRoutes)
+app.use("/api", authRoutes)
 app.use("/api", pantryRoutes);
 app.use("/api", pantryItemsRoutes)
 
-db.connection.connect((err) => {
-    if (err) {
-        console.log("Connessione al database fallita")
-        return
-    }
-    console.log("Connessione al database riuscita");
-})
-
-app.listen(3000, () => {
-    console.log("Server attivo su porta 3000");
-})
+app.listen(3000, '0.0.0.0', () => {
+    console.log(`Server attivo su http://localhost:3000`);
+});
