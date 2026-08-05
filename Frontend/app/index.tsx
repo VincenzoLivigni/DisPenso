@@ -16,11 +16,15 @@ export default function Home() {
       <Link href="/prodotto/42" style={styles.bottone}>
         Apri Ricetta 42 (Tiramisù)
       </Link>
-      
-     <Link href="Register" style={styles.bottone}>
+
+      <Link href="Register" style={styles.bottone}>
         fai la registrazione
       </Link>
-      
+
+      <Link href="Login" style={styles.bottone}>
+        Accedi
+      </Link>
+
 
     </View>
   );

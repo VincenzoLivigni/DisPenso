@@ -5,17 +5,21 @@ export default function RootLayout() {
   return (
     // Stack gestisce automaticamente le transizioni native tra le pagine
     <Stack>
-      <Stack.Screen 
-        name="index" 
-        options={{ title: 'Dispenso Home' }} 
-      />
-      <Stack.Screen 
-        name="prodotto/[id]" 
-        options={{ title: 'Dettaglio Prodotto' }} 
+      <Stack.Screen
+        name="index"
+        options={{ title: 'Dispenso Home' }}
       />
       <Stack.Screen
-      name="Register"
-      options={{title: 'Pagina Di Registrazione'}}
+        name="prodotto/[id]"
+        options={{ title: 'Dettaglio Prodotto' }}
+      />
+      <Stack.Screen
+        name="Register"
+        options={{ title: 'Pagina Di Registrazione' }}
+      />
+      <Stack.Screen
+        name="Login"
+        options={{ title: 'Pagina Di Accesso' }}
       />
     </Stack>
   );
