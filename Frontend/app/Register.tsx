@@ -1,71 +1,50 @@
-import { useState } from "react";
-import { TextInput, Text, View, Pressable, Alert, ActivityIndicator } from "react-native";
+import { useState, useContext } from "react";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
-
-const API = process.env.EXPO_PUBLIC_API_URL ? process.env.EXPO_PUBLIC_API_URL.trim() : ""
+import { AuthContext } from "./contexts/authContext";
 
 export default function Register() {
     const router = useRouter();
+    const auth = useContext(AuthContext);
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
-    const [error, setErrors] = useState<{ [key: string]: string }>({})
+    const [error, setError] = useState<{ email?: string; password?: string }>({})
 
     // Validazione form registrazione prima dell'invio
     const validationForm = () => {
-        const newErrors: { [key: string]: string } = {};
-        let valid = true;
+        const newError: { email?: string; password?: string; confirmPassword?: string } = {}
 
-        if (!email.trim()) {
-            newErrors.email = "L'email è obbligatoria"
-            valid = false
-        }
-
+        if (!email.trim()) newError.email = "L'email è obbligatoria"
         if (!password.trim()) {
-            newErrors.password = "La password è obbligatoria"
-            valid = false
+            newError.password = "La password è obbligatoria"
         } else if (password.length < 6) {
-            newErrors.password = "La password deve contenere almeno 6 caratteri"
-            valid = false
+            newError.password = "La password deve contenere almeno 6 caratteri"
         }
-
-        setErrors(newErrors)
-        return valid
+        setError(newError);
+        return Object.keys(newError).length === 0
     }
 
     // Invio dati al backend
     const handleRegister = async () => {
-        if (!validationForm()) {
-            return
-        }
+        if (!validationForm()) return
+        if (!auth) return
 
-        setLoading(true)
         try {
-            const res = await fetch(`${API}/register`, {
-                method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({ email, password })
-            })
+            await auth.register(email, password)
 
-            const data = await res.json()
+            // feedback per l'utente 
+            Alert.alert("Registrazione avvenuta con successo")
 
-            if (!res.ok) {
-                throw new Error(data.message || "Errore durante la registrazione")
-            }
+            setEmail("")
+            setPassword("")
+            setError({})
 
-            setEmail("");
-            setPassword("");
-            setErrors({});
-
-            Alert.alert("Registrazione completata correttamente!");
+            router.replace("/Login")
         }
         catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : "Errore durante la registrazione";
-            Alert.alert(errorMessage)
-        }
-        finally {
-            setLoading(false)
+            const errorMessage = err instanceof Error ? err.message : "Errore durante la registrazione. Riprova"
+            Alert.alert("Errore", errorMessage)
         }
     }
 
@@ -100,14 +79,8 @@ export default function Register() {
                 {error.password && <Text>{error.password}</Text>}
             </View>
 
-            <Pressable
-                onPress={handleRegister}
-                disabled={loading}>
-                {loading ? (
-                    <ActivityIndicator />
-                ) : (
-                    <Text>Registrati</Text>
-                )}
+            <Pressable onPress={handleRegister}>
+                <Text>Registrati</Text>
             </Pressable>
 
             <Pressable onPress={() => router.push("/Login")}>

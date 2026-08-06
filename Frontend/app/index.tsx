@@ -1,45 +1,27 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable, Platform } from 'react-native';
+import { useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
+import { useContext } from 'react'
+import { AuthContext } from './contexts/authContext'
 
 export default function Home() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const auth = useContext(AuthContext)
 
   useEffect(() => {
-    // Controllo autenticazione
-    const checkAuth = async () => {
-      let token = null;
-
-      if (Platform.OS === 'web') {
-        token = localStorage.getItem("user.token");
-      } else {
-        token = await SecureStore.getItemAsync("user.token");
-      }
-
-      // Se l'utente non è autenticato viene reindirizzato alla pagina di accesso
-      if (!token) {
-        router.replace('/Login');
-      } else {
-        setLoading(false);
-      }
+    // Se l'utente non è autenticato viene reindirizzato alla pagina di accesso
+    if (auth && !auth.loading && !auth.token) {
+      router.replace('/Login');
     };
-
-    checkAuth();
-  }, []);
+  }, [auth?.loading, auth?.token]);
 
   // Gestione del Logout
   const handleLogout = async () => {
-    if (Platform.OS === 'web') {
-      localStorage.removeItem("user.token");
-    } else {
-      await SecureStore.deleteItemAsync("user.token");
-    }
-    router.replace('/Login');
-  };
+    await auth?.logout()
+    router.replace("/Login")
+  }
 
-  if (loading) {
+  if (!auth || auth.loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator />

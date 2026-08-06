@@ -1,89 +1,46 @@
-import { useState } from "react";
-import { TextInput, Text, View, Pressable, Alert, ActivityIndicator, Platform } from "react-native";
-import * as SecureStore from 'expo-secure-store';
+import { useState, useContext } from "react";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
-
-const API = process.env.EXPO_PUBLIC_API_URL ? process.env.EXPO_PUBLIC_API_URL.trim() : "";
+import { AuthContext } from "./contexts/authContext";
 
 export default function Login() {
     const router = useRouter();
+    const auth = useContext(AuthContext)
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setErrors] = useState<{ [key: string]: string }>({});
+    const [error, setError] = useState<{ email?: string; password?: string }>({})
 
     // Validazione form accesso prima dell'invio
     const validationForm = () => {
-        const newErrors: { [key: string]: string } = {};
-        let valid = true;
+        const newError: { email?: string; password?: string } = {}
+        if (!email.trim()) newError.email = "L'email è obbligatoria"
+        if (!password.trim()) newError.password = "La password è obbligatoria"
 
-        if (!email.trim()) {
-            newErrors.email = "L'email è obbligatoria";
-            valid = false;
-        }
-
-        if (!password.trim()) {
-            newErrors.password = "La password è obbligatoria";
-            valid = false;
-        }
-
-        setErrors(newErrors);
-        return valid;
+        setError(newError)
+        return Object.keys(newError).length === 0
     };
 
     // Invio dati al backend
     const handleLogin = async () => {
-        if (!validationForm()) return;
+        if (!validationForm()) return
+        if (!auth) return
 
-        setLoading(true);
         try {
-            const res = await fetch(`${API}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || "Errore durante l'accesso");
-            }
-
-            // salvataggio token 
-            if (data.token) {
-                if (Platform.OS === 'web') {
-                    localStorage.setItem("user.token", data.token);
-                } else {
-                    await SecureStore.setItemAsync("user.token", data.token);
-                }
-            }
-
-            setEmail("");
-            setPassword("");
-            setErrors({});
+            // reindirizzamento alla attuale home
+            await auth.login(email, password)
 
             // feedback per l'utente 
-            if (typeof window !== "undefined" && window.alert) {
-                window.alert("Accesso effettuato con successo");
-            } else {
-                Alert.alert("Successo", "Accesso effettuato con successo");
-            }
+            Alert.alert("Accesso effettuato con successo")
 
-            // reindirizzamento alla attuale home
+            setEmail("");
+            setPassword("")
+            setError({})
+
             router.replace("/");
-        }
-        catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : "Errore durante il login";
-
-            if (typeof window !== "undefined" && window.alert) {
-                window.alert(errorMessage);
-            } else {
-                Alert.alert("Errore", errorMessage);
-            }
-        }
-        finally {
-            setLoading(false);
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : "Errore durante il login"
+            Alert.alert("Errore", errorMessage)
         }
     };
 
@@ -116,14 +73,8 @@ export default function Login() {
                 {error.password && <Text>{error.password}</Text>}
             </View>
 
-            <Pressable
-                onPress={handleLogin}
-                disabled={loading}>
-                {loading ? (
-                    <ActivityIndicator />
-                ) : (
-                    <Text>Accedi</Text>
-                )}
+            <Pressable onPress={handleLogin}>
+                <Text>Accedi</Text>
             </Pressable>
 
             <Pressable onPress={() => router.push("/Register")}>
