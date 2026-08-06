@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { AuthContext } from "./contexts/authContext";
+import { AuthContext } from "../contexts/authContext";
 
 export default function Login() {
     const router = useRouter();
@@ -37,7 +37,7 @@ export default function Login() {
             setPassword("")
             setError({})
 
-            router.replace("/");
+            router.replace("/Dashboard");
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "Errore durante il login"
             Alert.alert("Errore", errorMessage)

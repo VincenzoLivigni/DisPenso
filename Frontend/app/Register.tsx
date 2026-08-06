@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { AuthContext } from "./contexts/authContext";
+import { AuthContext } from "../contexts/authContext";
 
 export default function Register() {
     const router = useRouter();

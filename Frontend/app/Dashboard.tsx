@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useContext } from 'react'
-import { AuthContext } from './contexts/authContext'
+import { AuthContext } from '../contexts/authContext'
 
-export default function Home() {
+export default function Dashboard() {
   const router = useRouter();
   const auth = useContext(AuthContext)
 
