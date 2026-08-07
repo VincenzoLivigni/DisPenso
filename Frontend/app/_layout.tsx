@@ -15,7 +15,7 @@ export default function RootLayout() {
           options={{ title: 'Registrazione', headerShown: false }}
         />
         <Stack.Screen
-          name="Dashboad"
+          name="index"
           options={{ title: 'DisPenso Dashboard' }}
         />
         <Stack.Screen

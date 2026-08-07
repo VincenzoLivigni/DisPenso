@@ -13,9 +13,9 @@ app.get("/", (req, res) => {
     res.send("DisPenso backend attivo!")
 })
 
-app.use("/api", authRoutes)
-app.use("/api", pantryRoutes);
-app.use("/api", pantryItemsRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/pantry", pantryRoutes);
+app.use("/api/pantry-items", pantryItemsRoutes);
 
 app.listen(3000, '0.0.0.0', () => {
     console.log(`Server attivo su http://localhost:3000`);
