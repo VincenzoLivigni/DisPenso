@@ -24,11 +24,13 @@ export default function Login() {
 
     return (
         <AuthForm
-            title="Accedi a DisPenso"
+            title="Accedi"
             onSubmit={handleLogin}
             submitButtonText="Accedi"
-            secondaryButtonText="Non hai un account? Registrati"
-            onSecondaryPress={() => router.push("/Register")}
+            secondaryButtonText="Registrati"
+            onSecondaryPress={() => router.push('/Register')}
+            isRegister={false}
+            isLogin={true}
         />
     )
 }

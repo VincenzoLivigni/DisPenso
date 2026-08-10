@@ -24,12 +24,13 @@ export default function Register() {
 
     return (
         <AuthForm
-            title="Registrati per gestire la tua dispensa"
+            title="Registrati"
             onSubmit={handleRegister}
             submitButtonText="Registrati"
-            secondaryButtonText="Sei già registrato? Accedi"
+            secondaryButtonText="Accedi"
             onSecondaryPress={() => router.push('/Login')}
             isRegister={true}
+            isLogin={false}
         />
     )
 }
