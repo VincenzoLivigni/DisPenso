@@ -9,11 +9,10 @@ export default function RootLayout() {
       <Stack>
         {/* Gruppo Tabs (contiene la navbar in basso) */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        
+
         {/* Rotte autonome senza bottom tab */}
         <Stack.Screen name="Login" options={{ title: 'Accesso', headerShown: false }} />
         <Stack.Screen name="Register" options={{ title: 'Registrazione', headerShown: false }} />
-        {/* <Stack.Screen name="prodotto/[id]" options={{ title: 'Dettaglio Prodotto' }} /> */}
       </Stack>
     </AuthProvider>
   );
