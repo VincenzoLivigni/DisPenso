@@ -10,6 +10,8 @@ router.post("/pantries/:pantryId/items", authMiddleware, pantryItemsController.c
 router.get("/pantries/:pantryId/items", authMiddleware, pantryItemsController.getAllPantryItems);
 //expiring
 router.get("/pantries/:pantryId/expiring", authMiddleware, pantryItemsController.expiringItems);
+//expiring tutte cose
+router.get("/products/expiring", authMiddleware, pantryItemsController.expiringItemsGetAll);
 //reduceQuantityItem
 router.patch("/pantries/:pantryId/items/:itemId/consume", authMiddleware, pantryItemsController.reduceQuantityItem);
 //update item

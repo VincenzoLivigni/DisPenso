@@ -158,7 +158,7 @@ exports.getAllPantryItems = async (req, res) => {
     }
 }
 
-//SCADENZE PRODOTTI
+//SCADENZE PRODOTTI DISPENSA SPECIFICA
 exports.expiringItems = async (req, res) => {
     const { pantryId } = req.params
 
@@ -198,6 +198,58 @@ exports.expiringItems = async (req, res) => {
     }
 
 }
+
+//SCADENZE DI TUTTI I MIEI PRODOTTI
+exports.expiringItemsGetAll = async (req, res) => {
+    const userId = req.user.id;
+    const days = parseInt(req.query.days) || 7;
+
+    try {
+        const [items] = await db.query(
+            `SELECT
+                pantryItem.id AS pantry_item_id,
+                pantryItem.quantity,
+                pantryItem.expiration_date,
+                DATEDIFF(pantryItem.expiration_date, CURDATE()) AS days_remaining,
+                product.barcode,
+                product.name,
+                product.brand,
+                product.image_url,
+                pantry.id AS pantry_id,
+                pantry.name AS pantry_name
+            FROM pantry_items AS pantryItem
+            JOIN products AS product ON pantryItem.product_id = product.id
+            JOIN pantries AS pantry ON pantryItem.pantry_id = pantry.id
+            JOIN pantry_users AS pantryUser ON pantry.id = pantryUser.pantry_id
+            WHERE pantryUser.user_id = ?
+              AND pantryUser.status = 'accepted'
+              AND pantryItem.expiration_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
+            ORDER BY pantryItem.expiration_date ASC`,
+            [userId, days]
+        );
+
+        // Mappiamo i dati 
+        const formattedItems = items.map(item => ({
+            id: item.pantry_item_id.toString(),
+            name: item.name,
+            brand: item.brand,
+            image_url: item.image_url,
+            quantity: item.quantity,
+            expiration_date: item.expiration_date,
+            daysLeft: item.days_remaining,
+            pantry: {
+                id: item.pantry_id.toString(),
+                name: item.pantry_name
+            }
+        }));
+
+        return res.status(200).json(formattedItems);
+
+    } catch (err) {
+        console.error("Errore recupero scadenze globali:", err);
+        return res.status(500).json({ message: "Errore nel recuperare le scadenze dei prodotti" });
+    }
+};
 
 // MODIFICA QUANTITà
 exports.reduceQuantityItem = async (req, res) => {
