@@ -1,11 +1,29 @@
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
 
 const API = process.env.EXPO_PUBLIC_API_URL
     ? process.env.EXPO_PUBLIC_API_URL.trim()
     : "http://localhost:3000/api"
 
+
+//funzione di supporto per avere il token    
 export async function getToken() {
-    return await SecureStore.getItemAsync("token")
+
+    if (Platform.OS === 'web') { //condizione per testare dal web
+        return localStorage.getItem("token");
+    } else { //secureStore funziona solo da mobile
+        return await SecureStore.getItemAsync("token");
+    }
+}
+
+//funzione di supporto per autenticazione
+const auth  = async function() {
+    let token: unknown = await getToken()
+    if(typeof token === 'string') {
+
+    return { "Content-Type": "application/json" ,'Authorization': `Bearer ${token}`}
+    }
 }
 
 // REGISTRAZIONE
@@ -36,6 +54,21 @@ export async function loginUser(email: string, password: string) {
     const data = await res.json()
 
     if (!res.ok) throw new Error(data.message || "Errore durante la login")
+
+    return data
+}
+
+// TUTTE LE SCADENZE
+export async function allExpiringProducts() {
+
+    const res = await fetch(`${API}/pantry-items/products/expiring`, {
+        method: "GET",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore nel recuperare i prodotti in scadenza")
 
     return data
 }
