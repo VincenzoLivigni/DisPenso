@@ -25,7 +25,14 @@ const auth = async function () {
     }
 }
 
-// REGISTRAZIONE
+
+/*
+############################
+#####  AUTENTICAZIONE ######
+############################
+*/
+
+// REGISTRAZIONE ✅
 export async function registerUser(email: string, password: string) {
 
     const res = await fetch(`${API}/auth/register`, {
@@ -41,7 +48,7 @@ export async function registerUser(email: string, password: string) {
     return data
 }
 
-// LOGIN
+// LOGIN ✅
 export async function loginUser(email: string, password: string) {
 
     const res = await fetch(`${API}/auth/login`, {
@@ -57,22 +64,49 @@ export async function loginUser(email: string, password: string) {
     return data
 }
 
-// TUTTE LE DISPENSE
-export async function allPantries() {
+
+/*
+############################
+### GESTIONE DISPENSE ####
+############################
+*/
+
+// CREA DISPENSA ✅
+export async function createNewPantry(nomeNuovaDispensa: string) {
 
     const res = await fetch(`${API}/pantry/pantries`, {
-        method: "GET",
-        headers: await auth()
+        method: "POST",
+        headers: await auth(),
+        body: JSON.stringify({ name: nomeNuovaDispensa })
     })
 
     const data = await res.json()
 
-    if (!res.ok) throw new Error(data.message || "Errore nel recuperare le dispense")
+    if (!res.ok) throw new Error(data.message || "Errore durante la creazione della nuova dispensa")
 
     return data
 }
 
-// TUTTI I PRODOTTI
+
+// ACCETTA MEMBRO NELLA DISPENSA  ❌
+
+// RICHIESTA UNIONE A DISPENSA ❌
+
+// RECUPERA MEMBRI DISPENSA  ❌
+
+// GESTIONE RIMOZIONE MEMBRI DISPENSA ❌
+
+
+
+/*
+############################
+### AZIONI SUI PRODOTTI ####
+############################
+*/
+
+// AGGIUNGI PRODOTTO ALLA DISPENSA ❌
+
+// PRODOTTI DISPENSA SPECIFICA ✅
 export async function pantryProducts(pantryId: number) {
 
     const res = await fetch(`${API}/pantry-items/pantries/${pantryId}/items`, {
@@ -87,7 +121,22 @@ export async function pantryProducts(pantryId: number) {
     return data
 }
 
-// TUTTE LE SCADENZE
+// LISTA DISPENSE ✅
+export async function allPantries() {
+
+    const res = await fetch(`${API}/pantry/pantries`, {
+        method: "GET",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore nel recuperare le dispense")
+
+    return data
+}
+
+// TUTTE LE SCADENZE ✅
 export async function allExpiringProducts() {
 
     const res = await fetch(`${API}/pantry-items/products/expiring`, {
@@ -101,3 +150,9 @@ export async function allExpiringProducts() {
 
     return data
 }
+
+// MODIFICA QUANTITA/SCADENZE PRODOTTO  ❌
+
+// CONSUMO PRODOTTO ❌
+
+// ELIMINA PRODOTTO ❌

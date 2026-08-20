@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, FlatList } from "react-native"
+import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Alert } from "react-native"
 import Accordions from "../../components/Accordions"
-import { allPantries } from "../../services/api"
+import { allPantries, createNewPantry } from "../../services/api"
 import { useEffect, useState } from "react"
 import Filters from "../../components/FIlters"
 
@@ -18,6 +18,32 @@ export default function Dispense() {
     const [loading, setLoading] = useState(false)
     const [pantries, setPantries] = useState<dataPantries[]>([])
 
+    const [newPantry, setNewPantry] = useState("")
+
+
+    // CREAZIONE NUOVA DISPENSA
+    const createPantry = async () => {
+        if (newPantry.trim().length < 3) {
+            return Alert.alert("Nome dispensa non valido")
+        }
+
+        try {
+            const dataNewPantry = await createNewPantry(newPantry.trim())
+            if (dataNewPantry && dataNewPantry.id) {
+                setPantries((prev) => [...prev, dataNewPantry])
+            } else {
+                await loadPantries()
+            }
+        }
+        catch (err: unknown) {
+            Alert.alert("Impossibile creare la dispensa")
+        }
+        finally {
+            setNewPantry("")
+        }
+    }
+
+    // RECUPERA TUTTE LE DISPENSE
     async function loadPantries() {
         try {
             setLoading(true)
@@ -41,7 +67,19 @@ export default function Dispense() {
         <>
             <View>
 
-                <Filters></Filters>
+                <View>
+                    <TextInput
+                        placeholder="Aggiungi una nuova dispensa"
+                        value={newPantry}
+                        onChangeText={setNewPantry}
+                    />
+
+                    <Pressable onPress={createPantry}>
+                        <Text>Aggiungi</Text>
+                    </Pressable>
+                </View>
+
+                <Filters />
 
                 <View style={styles.pantriesContainer}>
 
