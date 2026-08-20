@@ -73,16 +73,16 @@ export async function allPantries() {
 }
 
 // TUTTI I PRODOTTI
-export async function pantryProducts() {
+export async function pantryProducts(pantryId: number) {
 
-    const res = await fetch(`${API}/pantry-items/pantries/1/items`, {
+    const res = await fetch(`${API}/pantry-items/pantries/${pantryId}/items`, {
         method: "GET",
         headers: await auth()
     })
 
     const data = await res.json()
 
-    if (!res.ok) throw new Error(data.message || `Errore nel recuperare i prodotti della dispensa numero 1`)
+    if (!res.ok) throw new Error(data.message || `Errore nel recuperare i prodotti della dispensa numero ${pantryId}`)
 
     return data
 }
