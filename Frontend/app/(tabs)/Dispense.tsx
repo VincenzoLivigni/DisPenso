@@ -65,17 +65,18 @@ export default function Dispense() {
 
     return (
         <>
-            <View>
+            <View style={styles.mainContainer}>
 
-                <View>
+                <View style={styles.createdContainer}>
                     <TextInput
                         placeholder="Aggiungi una nuova dispensa"
                         value={newPantry}
                         onChangeText={setNewPantry}
+                        style={styles.input}
                     />
 
-                    <Pressable onPress={createPantry}>
-                        <Text>Aggiungi</Text>
+                    <Pressable style={styles.button} onPress={createPantry}>
+                        <Text style={styles.textButton}>Aggiungi</Text>
                     </Pressable>
                 </View>
 
@@ -100,7 +101,45 @@ export default function Dispense() {
 }
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        backgroundColor: "#ccc",
+    },
+    createdContainer: {
+        marginHorizontal: 13,
+        marginVertical: 15,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+    },
+    input: {
+        flex: 1,
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderColor: "#6e6e6e",
+        borderRadius: 10
+    },
+    button: {
+        backgroundColor: "#3baecb",
+        borderWidth: 1,
+        borderColor: "#6e6e6e",
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    textButton: {
+        color: "white",
+        fontWeight: "600"
+    },
+
+
     pantriesContainer: {
-        height: 400
-    }
+        flex: 1,
+        marginHorizontal: 13,
+        marginVertical: 15,
+    },
 })

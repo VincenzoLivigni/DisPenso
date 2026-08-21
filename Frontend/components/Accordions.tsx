@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, FlatList, Image } from 'react-native';
 import { pantryProducts } from "../services/api"
 
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Octicons from '@expo/vector-icons/Octicons';
+
 const placeholder = require("../assets/placeholder.png");
 
 type dataPantryItems = {
@@ -50,74 +53,107 @@ export default function Accordions({ nomeDispensa, pantryId }: AccordionProps) {
 
 
     return (
-        <>
-            <View>
-                <Pressable style={styles.toggle} onPress={() => setIsOpen(!isOpen)}>
-                    <Text style={styles.titlePantry}>{nomeDispensa}</Text>
-                    <Text>
-                        {!isOpen ? "⬇️" : "⬆️"}
-                    </Text>
-                </Pressable>
-            </View>
+        <View style={styles.container}>
+
+            <Pressable style={styles.toggle} onPress={() => setIsOpen(!isOpen)}>
+                <Text style={styles.titlePantry}>{nomeDispensa}</Text>
+                {
+                    !isOpen ? (
+                        <MaterialIcons name="keyboard-arrow-down" size={20} color="#6e6e6e" />
+                    ) : (
+                        <MaterialIcons name="keyboard-arrow-up" size={20} color="#6e6e6e" />
+                    )}
+            </Pressable>
+
+
             {isOpen && (
                 <View style={styles.accordionContainer}>
-                    <FlatList
-                        data={products}
-                        keyExtractor={(item) => item.item_id.toString()}
-                        renderItem={({ item }) => (
-                            <View style={styles.card}>
+                    {
+                        products.map((p) => (
+                            <View key={p.item_id} style={styles.card}>
                                 <Image
                                     source={
-                                        item.image_url
-                                            ? { uri: item.image_url }
+                                        p.image_url
+                                            ? { uri: p.image_url }
                                             : placeholder
                                     }
                                     style={styles.image}
+                                    resizeMode="cover"
                                 />
-                                <Text style={styles.info}>{item.name}</Text>
-                                <Text style={styles.info}>{item.quantity}</Text>
-                                <Text style={styles.info}>{item.expiration_date}</Text>
+                                <View style={styles.infoContainer}>
+                                    <Text style={styles.productName}>{p.name}</Text>
+                                    <Text style={styles.info}>{p.quantity}</Text>
+                                    <Text style={styles.info}>{p.expiration_date}</Text>
+                                </View>
 
                                 <View style={styles.actions}>
-                                    <Text>✏️{/* modale modifica */}</Text>
-                                    <Text>🗑️{/* modale elimina */}</Text>
+                                    <Octicons name="pencil" size={20} color="black" />{/* modale modifica */}
+                                    <MaterialIcons name="delete" size={22} color="black" />{/* modale elimina */}
                                 </View>
 
                             </View>
-                        )}
-                    />
+                        ))}
                 </View>
             )}
-        </>
+        </View>
     )
 }
 
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: "white",
+        paddingVertical: 15,
+        paddingHorizontal: 8,
+        marginBottom: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#6e6e6e",
+        overflow: "hidden"
+    },
     toggle: {
+        paddingHorizontal: 10,
         flexDirection: "row",
+        justifyContent: "space-between",
         alignItems: "center"
     },
-    accordionContainer: {
-        marginTop: 20
-    },
     titlePantry: {
-
+        fontWeight: "600"
+    },
+    accordionContainer: {
+        gap: 8,
+        marginTop: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderTopWidth: 2,
+        borderTopColor: "#ccc"
     },
     card: {
-        width: 100,
-        height: 100,
+        padding: 8,
+        borderWidth: 1,
+        borderColor: "#6e6e6e",
+        borderRadius: 8,
         flexDirection: "row",
+        alignItems: "center",
+
     },
     image: {
-        width: 80,
-        height: 80
+        width: 60,
+        height: 60,
+        borderRadius: 8
+    },
+    infoContainer: {
+        flex: 1,
+        marginHorizontal: 10
+    },
+    productName: {
+        fontWeight: "600",
     },
     info: {
-        margin: 4
+
     },
     actions: {
         flexDirection: "row",
-        alignItems: "center"
-    }
+        gap: 10
+    },
 })
