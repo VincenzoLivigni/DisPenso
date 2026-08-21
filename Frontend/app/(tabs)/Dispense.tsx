@@ -17,8 +17,11 @@ export default function Dispense() {
 
     const [loading, setLoading] = useState(false)
     const [pantries, setPantries] = useState<dataPantries[]>([])
+  
 
     const [newPantry, setNewPantry] = useState("")
+
+    const [searchPantry, setSearchPantry] = useState("")//filtro per cercare le dispense per nome
 
 
     // CREAZIONE NUOVA DISPENSA
@@ -42,6 +45,10 @@ export default function Dispense() {
             setNewPantry("")
         }
     }
+
+    const filteredPantries = pantries.filter(p => p.name.toLowerCase().includes(searchPantry.toLowerCase().trim()))
+
+
 
     // RECUPERA TUTTE LE DISPENSE
     async function loadPantries() {
@@ -80,8 +87,15 @@ export default function Dispense() {
                     </Pressable>
                 </View>
 
-                <Filters />
+                {/* //SEARCH BAR PER FILTRARE*/}
 
+
+                <Filters
+                search = {searchPantry}
+                onChangeSearch = {setSearchPantry}
+                />
+
+                {/* ACCORDION CHE VIENE STAMPATO */}
                 <View style={styles.pantriesContainer}>
 
                     <FlatList
@@ -91,6 +105,7 @@ export default function Dispense() {
                             <Accordions
                                 nomeDispensa={item.name}
                                 pantryId={item.id}
+                                search= {searchPantry}
                             />
                         )}
                     />

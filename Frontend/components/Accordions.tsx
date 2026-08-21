@@ -22,14 +22,17 @@ type dataPantryItems = {
 type AccordionProps = {
     nomeDispensa: string;
     pantryId: number;
+    search: string
 }
 
-export default function Accordions({ nomeDispensa, pantryId }: AccordionProps) {
+export default function Accordions({ nomeDispensa, pantryId, search }: AccordionProps) {
 
 
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [products, setProducts] = useState<dataPantryItems[]>([])
+
+    const cleanSearch = search.toLowerCase().trim()//la nostra ricerca
 
     async function loadProducts() {
         try {
@@ -46,19 +49,30 @@ export default function Accordions({ nomeDispensa, pantryId }: AccordionProps) {
     }
 
     useEffect(() => {
-        if (isOpen && products.length === 0) {
+        if ((isOpen || cleanSearch !== "")&& products.length === 0) {
             loadProducts()
         }
-    }, [isOpen])
+    }, [isOpen, cleanSearch])
 
+    const filteredProducts = products.filter(p => p.name.toLowerCase().includes(cleanSearch))
+    
+    const productMatch = filteredProducts.length > 0
 
+    
+    const autoOpen = isOpen || (cleanSearch !== '' && productMatch)
+    
     return (
+
+        cleanSearch !== '' && !productMatch ? (
+     <Text>Nessun prodotto trovato con questo nome</Text>
+    ) : (
+
         <View style={styles.container}>
 
             <Pressable style={styles.toggle} onPress={() => setIsOpen(!isOpen)}>
                 <Text style={styles.titlePantry}>{nomeDispensa}</Text>
                 {
-                    !isOpen ? (
+                    !autoOpen ? (
                         <MaterialIcons name="keyboard-arrow-down" size={20} color="#6e6e6e" />
                     ) : (
                         <MaterialIcons name="keyboard-arrow-up" size={20} color="#6e6e6e" />
@@ -66,10 +80,10 @@ export default function Accordions({ nomeDispensa, pantryId }: AccordionProps) {
             </Pressable>
 
 
-            {isOpen && (
+            {autoOpen && (
                 <View style={styles.accordionContainer}>
                     {
-                        products.map((p) => (
+                        filteredProducts.map((p) => (
                             <View key={p.item_id} style={styles.card}>
                                 <Image
                                     source={
@@ -96,7 +110,7 @@ export default function Accordions({ nomeDispensa, pantryId }: AccordionProps) {
                 </View>
             )}
         </View>
-    )
+    ))
 }
 
 

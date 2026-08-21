@@ -1,12 +1,25 @@
 import { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 
-export default function Filters() {
+type FiltersProps = {
+    search: string
+    onChangeSearch: (text:string) => void
+}
+
+export default function Filters({ search, onChangeSearch }: FiltersProps) {
 
     return (
         <>
-            <View style={styles.filtersContainer}>
-                <Text>Sezione filtraggio</Text>
+            <View style={styles.filteredContainer}>
+                               
+              <Text>Cerca prodotto</Text>
+                <TextInput
+                    placeholder="nome prodotto"
+                    value={search}
+                    onChangeText={onChangeSearch}
+                    style={styles.input}
+                /> 
+
             </View>
         </>
     )
@@ -14,7 +27,18 @@ export default function Filters() {
 
 
 const styles = StyleSheet.create({
-    filtersContainer: {
-
+    filteredContainer: {
+        marginHorizontal: 13,
+        marginVertical: 15,
+        gap: 10,
     },
+      input: {
+        flex: 1,
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderColor: "#6e6e6e",
+        borderRadius: 10
+    }
 })
