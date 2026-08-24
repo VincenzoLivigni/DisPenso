@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, FlatList, Image } from 'react-native';
-import { pantryProducts } from "../services/api"
+import { useState } from 'react';
+import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
@@ -19,54 +18,23 @@ type dataPantryItems = {
     "image_url": string | null,
     "category": string | null
 }
+
 type AccordionProps = {
     nomeDispensa: string;
     pantryId: number;
-    search: string
+    search: string;
+    products: dataPantryItems[];
 }
 
-export default function Accordions({ nomeDispensa, pantryId, search }: AccordionProps) {
-
+export default function Accordions({ nomeDispensa, search, products }: AccordionProps) {
 
     const [isOpen, setIsOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [products, setProducts] = useState<dataPantryItems[]>([])
 
-    const cleanSearch = search.toLowerCase().trim()//la nostra ricerca
-
-    async function loadProducts() {
-        try {
-            setLoading(true)
-            const data = await pantryProducts(pantryId)
-            setProducts(data)
-        }
-        catch (err) {
-            console.log(err)
-        }
-        finally {
-            setLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        if ((isOpen || cleanSearch !== "")&& products.length === 0) {
-            loadProducts()
-        }
-    }, [isOpen, cleanSearch])
-
-    const filteredProducts = products.filter(p => p.name.toLowerCase().includes(cleanSearch))
-    
-    const productMatch = filteredProducts.length > 0
-
-    
+    const cleanSearch = search.toLowerCase().trim()
+    const productMatch = products.length > 0
     const autoOpen = isOpen || (cleanSearch !== '' && productMatch)
-    
+
     return (
-
-        cleanSearch !== '' && !productMatch ? (
-     <Text>Nessun prodotto trovato con questo nome</Text>
-    ) : (
-
         <View style={styles.container}>
 
             <Pressable style={styles.toggle} onPress={() => setIsOpen(!isOpen)}>
@@ -79,40 +47,39 @@ export default function Accordions({ nomeDispensa, pantryId, search }: Accordion
                     )}
             </Pressable>
 
-
             {autoOpen && (
                 <View style={styles.accordionContainer}>
-                    {
-                        filteredProducts.map((p) => (
-                            <View key={p.item_id} style={styles.card}>
-                                <Image
-                                    source={
-                                        p.image_url
-                                            ? { uri: p.image_url }
-                                            : placeholder
-                                    }
-                                    style={styles.image}
-                                    resizeMode="cover"
-                                />
-                                <View style={styles.infoContainer}>
-                                    <Text style={styles.productName}>{p.name}</Text>
-                                    <Text style={styles.info}>{p.quantity}</Text>
-                                    <Text style={styles.info}>{p.expiration_date}</Text>
-                                </View>
-
-                                <View style={styles.actions}>
-                                    <Octicons name="pencil" size={20} color="black" />{/* modale modifica */}
-                                    <MaterialIcons name="delete" size={22} color="black" />{/* modale elimina */}
-                                </View>
-
+                    {products.map((p) => (
+                        <View key={p.item_id} style={styles.card}>
+                            <Image
+                                source={
+                                    p.image_url
+                                        ? { uri: p.image_url }
+                                        : placeholder
+                                }
+                                style={styles.image}
+                                resizeMode="cover"
+                            />
+                            <View style={styles.infoContainer}>
+                                <Text style={styles.productName}>{p.name}</Text>
+                                <Text style={styles.info}>{p.quantity}</Text>
+                                <Text style={styles.info}>
+                                    {p.expiration_date && new Date(p.expiration_date).toLocaleDateString('it-IT')}
+                                </Text>
                             </View>
-                        ))}
+
+                            <View style={styles.actions}>
+                                <Octicons name="pencil" size={20} color="black" />
+                                <MaterialIcons name="delete" size={22} color="black" />
+                            </View>
+
+                        </View>
+                    ))}
                 </View>
             )}
         </View>
-    ))
+    )
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -149,7 +116,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         flexDirection: "row",
         alignItems: "center",
-
     },
     image: {
         width: 60,
@@ -163,9 +129,7 @@ const styles = StyleSheet.create({
     productName: {
         fontWeight: "600",
     },
-    info: {
-
-    },
+    info: {},
     actions: {
         flexDirection: "row",
         gap: 10
