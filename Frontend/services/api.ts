@@ -177,4 +177,19 @@ export async function updateProduct(
 
 // CONSUMO PRODOTTO ❌
 
-// ELIMINA PRODOTTO ❌
+// ELIMINA PRODOTTO ✅
+export async function deleteProduct(
+    pantryId: number,
+    itemId: number) {
+
+    const res = await fetch(`${API}/pantry-items/pantries/${pantryId}/items/${itemId}`, {
+        method: "DELETE",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore durante l'eliminazione del prodotto")
+
+    return data
+}

@@ -3,7 +3,9 @@ import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
+
 import EditProductModal from './EditProductModal';
+import DeleteProductModal from './DeleteProductModal';
 
 const placeholder = require("../assets/placeholder.png");
 
@@ -26,6 +28,7 @@ type AccordionProps = {
     search: string;
     products: dataPantryItems[],
     onUpdateProduct: (pantryId: number, itemId: number, quantity: number, expiring_date: string) => Promise<void>
+    onDeleteProduct: (pantryId: number, itemId: number) => Promise<void>
 }
 
 export default function Accordions({
@@ -33,12 +36,18 @@ export default function Accordions({
     search,
     products,
     pantryId,
-    onUpdateProduct }: AccordionProps) {
+    onUpdateProduct,
+    onDeleteProduct }: AccordionProps) {
 
     const [isOpen, setIsOpen] = useState(false)
 
+    // stati modifica prodotto
     const [selectedProduct, setSelectedProduct] = useState<dataPantryItems | null>(null);
     const [isOpenEditModal, setIsOpenEditModal] = useState(false);
+
+    // stati elimina prodotto
+    const [selectedProductToDelete, setSelectedProductToDelete] = useState<dataPantryItems | null>(null);
+    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
     const cleanSearch = search.toLowerCase().trim()
     const productMatch = products.length > 0
@@ -48,6 +57,15 @@ export default function Accordions({
         if (!selectedProduct) return
         await onUpdateProduct(pantryId, selectedProduct.item_id, newQuantity, newExpiring)
     }
+
+
+    const handleConfirmDelete = async () => {
+        if (selectedProductToDelete) {
+            await onDeleteProduct(pantryId, selectedProductToDelete.item_id);
+            setIsOpenDeleteModal(false);
+            setSelectedProductToDelete(null);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -88,7 +106,9 @@ export default function Accordions({
                                     <Octicons name="pencil" size={20} color="black" />
                                 </Pressable>
 
-                                <MaterialIcons name="delete" size={22} color="black" />
+                                <Pressable onPress={() => { setSelectedProductToDelete(p); setIsOpenDeleteModal(true) }}>
+                                    <MaterialIcons name="delete" size={22} color="black" />
+                                </Pressable>
                             </View>
 
                         </View>
@@ -102,6 +122,14 @@ export default function Accordions({
                 product={selectedProduct}
                 onClose={() => setIsOpenEditModal(false)}
                 onSave={handleSave}
+            />
+
+            {/* Modale di Cancellazione */}
+            <DeleteProductModal
+                isOpenDeleteModal={isOpenDeleteModal}
+                product={selectedProductToDelete}
+                onConfirm={handleConfirmDelete}
+                onClose={() => setIsOpenDeleteModal(false)}
             />
         </View>
     )

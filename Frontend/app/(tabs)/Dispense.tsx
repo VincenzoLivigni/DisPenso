@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Alert } from "react-native"
 import Accordions from "../../components/Accordions"
-import { allPantries, createNewPantry, pantryProducts, updateProduct } from "../../services/api"
+import { allPantries, createNewPantry, pantryProducts, updateProduct, deleteProduct } from "../../services/api"
 import { useEffect, useState } from "react"
 import Filters from "../../components/FIlters"
 
@@ -111,6 +111,22 @@ export default function Dispense() {
         }
     };
 
+    // ELIMINA PRODOTTO
+    const handleDeleteProduct = async (pantryId: number, itemId: number) => {
+        try {
+            await deleteProduct(pantryId, itemId);
+
+            setProducts((prevProducts) => ({
+                ...prevProducts,
+                [pantryId]: (prevProducts[pantryId] || []).filter((p) => p.item_id !== itemId),
+            }));
+        }
+        catch (err) {
+            console.log("Errore", err)
+            Alert.alert("Errore", "Impossibile eliminare il prodotto");
+        }
+    }
+
     useEffect(() => {
         loadPantries()
     }, [])
@@ -175,6 +191,7 @@ export default function Dispense() {
                                     pantryId={item.id}
                                     search={searchPantry}
                                     onUpdateProduct={handleUpdateProduct}
+                                    onDeleteProduct={handleDeleteProduct}
                                 />
                             )
                         }}
