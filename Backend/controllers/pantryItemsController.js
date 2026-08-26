@@ -324,7 +324,12 @@ exports.updateItem = async (req, res) => {
 
         //constante con i vecchi valori
         const newQuantity = quantity !== undefined ? quantity : items[0].quantity
-        const newExpirationDate = expiration_date !== undefined ? expiration_date : items[0].expiration_date
+        let newExpirationDate = items[0].expiration_date
+
+        if (expiration_date !== undefined) {
+            // Se dal frontend arriva una stringa vuota, forziamo 'null' 
+            newExpirationDate = expiration_date === "" ? null : expiration_date;
+        }
 
         await db.query(
             'UPDATE pantry_items SET quantity = ?, expiration_date = ? WHERE id = ? AND pantry_id = ?',
@@ -341,7 +346,7 @@ exports.updateItem = async (req, res) => {
         })
 
     } catch (err) {
-        console.log(err);
+        console.log("Errore db:", err.message);
         return res.status(500).json({ message: "Errore durante la modifica del prodotto" })
     }
 }

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Alert } from "react-native"
 import Accordions from "../../components/Accordions"
-import { allPantries, createNewPantry, pantryProducts } from "../../services/api"
+import { allPantries, createNewPantry, pantryProducts, updateProduct } from "../../services/api"
 import { useEffect, useState } from "react"
 import Filters from "../../components/FIlters"
 
@@ -85,6 +85,32 @@ export default function Dispense() {
         }
     }
 
+    // AGGIORNAMENTO PRODOTTO BACKEND E IN LOCALE
+    const handleUpdateProduct = async (
+        pantryId: number,
+        itemId: number,
+        quantity: number,
+        expiring_date: string
+    ) => {
+        try {
+            // chiamata api per salvare la modifica nel db
+            await updateProduct(pantryId, itemId, quantity, expiring_date);
+
+            // modifiche in tempo reale
+            setProducts((prevProducts) => ({
+                ...prevProducts,
+                [pantryId]: (prevProducts[pantryId] || []).map((p) =>
+                    p.item_id === itemId
+                        ? { ...p, quantity, expiration_date: expiring_date }
+                        : p
+                ),
+            }));
+        } catch (err) {
+            console.log("Errore", err)
+            Alert.alert("Errore", "Impossibile aggiornare il prodotto");
+        }
+    };
+
     useEffect(() => {
         loadPantries()
     }, [])
@@ -137,7 +163,7 @@ export default function Dispense() {
                     <Text style={styles.notFoundText}>Nessun prodotto trovato con questo nome</Text>
                 ) : (
                     <FlatList
-                        data={visiblePantries} 
+                        data={visiblePantries}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => {
                             const pantryProds = filteredProductsForPantry(item.id)
@@ -148,6 +174,7 @@ export default function Dispense() {
                                     products={pantryProds}
                                     pantryId={item.id}
                                     search={searchPantry}
+                                    onUpdateProduct={handleUpdateProduct}
                                 />
                             )
                         }}

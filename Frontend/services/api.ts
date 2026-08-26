@@ -25,7 +25,6 @@ const auth = async function () {
     }
 }
 
-
 /*
 ############################
 #####  AUTENTICAZIONE ######
@@ -151,7 +150,30 @@ export async function allExpiringProducts() {
     return data
 }
 
-// MODIFICA QUANTITA/SCADENZE PRODOTTO  ❌
+// MODIFICA QUANTITA/SCADENZE PRODOTTO  ✅
+export async function updateProduct(
+    pantryId: number,
+    itemId: number,
+    quantityProduct: number,
+    expirationProduct: string) {
+
+    const authHeaders = await auth();
+
+    const res = await fetch(`${API}/pantry-items/pantries/${pantryId}/items/${itemId}`, {
+        method: "PATCH",
+        headers: {
+            ...authHeaders,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quantity: quantityProduct, expiration_date: expirationProduct })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore durante la modifica del prodotto")
+
+    return data
+}
 
 // CONSUMO PRODOTTO ❌
 
