@@ -39,34 +39,38 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
             <Modal visible={isOpenEditModal} transparent={true}>
                 <View style={styles.editModal}>
                     <View style={styles.modalContent}>
-                        <Text>Modifica {product.name}</Text>
+                        <Text style={styles.title}>Modifica
+                            <Text style={styles.productName}>{product.name}</Text>
+                        </Text>
 
-                        <View>
-                            <Text>Modifica quantità</Text>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Modifica quantità</Text>
                             <TextInput
                                 keyboardType="number-pad"
                                 placeholder="Modifica la quantità del prodotto"
                                 value={newQuantity}
                                 onChangeText={setNewQuantity}
+                                style={styles.input}
                             />
                         </View>
 
-                        <View>
-                            <Text>Modifica data di scadenza</Text>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Modifica data di scadenza</Text>
                             <TextInput
                                 placeholder="Modifica la data di scadenza del prodotto"
                                 value={newExpiration}
                                 onChangeText={setNewExpiration}
+                                style={styles.input}
                             />
                         </View>
 
-                        <View>
-                            <Pressable onPress={handleSaveModal}>
-                                <Text>Salva</Text>
+                        <View style={styles.actionsContainer}>
+                            <Pressable onPress={handleSaveModal} style={styles.saveButton}>
+                                <Text style={styles.textButton}>Salva</Text>
                             </Pressable>
 
-                            <Pressable onPress={onClose}>
-                                <Text>Annulla</Text>
+                            <Pressable onPress={onClose} style={styles.nullButton}>
+                                <Text style={styles.textButton}>Annulla</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -88,4 +92,59 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10
     },
+    title: {
+        fontSize: 20,
+        fontWeight: 600,
+        textAlign: "center",
+        marginBottom: 25,
+    },
+    productName: {
+        color: "#3bafcb",
+        marginLeft: 5
+    },
+    inputContainer: {
+        marginBottom: 25,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#2a2a2a',
+        marginBottom: 8,
+    },
+    input: {
+        height: 40,
+        backgroundColor: '#f3f3f3',
+        borderRadius: 10,
+        paddingHorizontal: 16,
+        fontSize: 15,
+        color: 'black',
+        borderWidth: 1,
+        borderColor: 'transparent'
+    },
+    actionsContainer: {
+        flexDirection: "row",
+        gap: 15,
+    },
+    saveButton: {
+        height: 40,
+        backgroundColor: "#63be3f",
+        borderRadius: 10,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    nullButton: {
+        height: 40,
+        backgroundColor: "#959595",
+        borderRadius: 10,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    textButton: {
+        color: "white",
+        fontWeight: 600,
+    }
 });

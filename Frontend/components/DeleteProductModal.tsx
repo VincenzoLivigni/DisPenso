@@ -24,15 +24,17 @@ export default function DeleteProductModal({ isOpenDeleteModal, product, onConfi
                 <View style={styles.deleteModal}>
                     <View style={styles.modalContent}>
 
-                        <Text>Sei sicuro di voler eliminare {product.name}?</Text>
+                        <Text style={styles.title}>Vuoi eliminare
+                            <Text style={styles.productName}>{product.name}</Text>?
+                        </Text>
 
-                        <View>
-                            <Pressable onPress={onConfirm}>
-                                <Text>Elimina</Text>
+                        <View style={styles.actionsContainer}>
+                            <Pressable onPress={onConfirm} style={styles.deleteButton}>
+                                <Text style={styles.textButton}>Elimina</Text>
                             </Pressable>
 
-                            <Pressable onPress={onClose}>
-                                <Text>Annulla</Text>
+                            <Pressable onPress={onClose} style={styles.nullButton}>
+                                <Text style={styles.textButton}>Annulla</Text>
                             </Pressable>
                         </View>
 
@@ -55,4 +57,40 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10
     },
+    title: {
+        fontSize: 20,
+        fontWeight: 600,
+        textAlign: "center",
+        marginBottom: 25,
+    },
+    productName: {
+        color: "#3bafcb",
+        marginLeft: 5
+    },
+    actionsContainer: {
+        flexDirection: "row",
+        gap: 15,
+    },
+    deleteButton: {
+        height: 40,
+        backgroundColor: "#cb3b3b",
+        borderRadius: 10,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    nullButton: {
+        height: 40,
+        backgroundColor: "#959595",
+        borderRadius: 10,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    textButton: {
+        color: "white",
+        fontWeight: 600,
+    }
 });
