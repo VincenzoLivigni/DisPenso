@@ -328,7 +328,7 @@ exports.updateItem = async (req, res) => {
 
         if (expiration_date !== undefined) {
             // Se dal frontend arriva una stringa vuota, forziamo 'null' 
-            newExpirationDate = expiration_date === "" ? null : expiration_date;
+            newExpirationDate = (expiration_date && expiration_date !== "") ? expiration_date.split('T')[0] : null;
         }
 
         await db.query(

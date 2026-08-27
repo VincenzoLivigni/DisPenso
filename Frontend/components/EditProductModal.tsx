@@ -22,7 +22,10 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
     useEffect(() => {
         if (product) {
             setNewQuantity(product.quantity.toString())
-            setNewExpiration(product.expiration_date)
+
+            const formattedDate = product.expiration_date ? product.expiration_date.split('T')[0] : ""
+            
+            setNewExpiration(formattedDate)
         }
     }, [product])
 

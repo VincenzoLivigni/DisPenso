@@ -97,7 +97,7 @@ export default function Accordions({
                                 <Text style={styles.productName}>{p.name}</Text>
                                 <Text style={styles.info}>{p.quantity}</Text>
                                 <Text style={styles.info}>
-                                    {p.expiration_date && (p.expiration_date)}
+                                    {p.expiration_date ? p.expiration_date.split('T')[0].split('-').reverse().join('/') : ""}
                                 </Text>
                             </View>
 
