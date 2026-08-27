@@ -4,6 +4,9 @@ import { allPantries, createNewPantry, pantryProducts, updateProduct, deleteProd
 import { useEffect, useState } from "react"
 import Filters from "../../components/FIlters"
 
+export type NameSortOption = 'none' | 'name-asc' | 'name-desc';
+export type QtySortOption = 'none' | 'qty-asc' | 'qty-desc';
+
 export default function Dispense() {
 
     type dataPantries = {
@@ -28,12 +31,16 @@ export default function Dispense() {
         "category": string | null
     }
 
+
     const [loading, setLoading] = useState(false)
     const [pantries, setPantries] = useState<dataPantries[]>([])
     const [products, setProducts] = useState<{ [pantryId: number]: dataPantryItems[] }>({})
 
     const [newPantry, setNewPantry] = useState("")
     const [searchPantry, setSearchPantry] = useState("")
+
+    const [nameSort, setNameSort] = useState<NameSortOption>('none');
+    const [qtySort, setQtySort] = useState<QtySortOption>('none');
 
     // CREAZIONE NUOVA DISPENSA
     const createPantry = async () => {
@@ -136,8 +143,37 @@ export default function Dispense() {
     // Filtriamo i prodotti per ogni dispensa
     const filteredProductsForPantry = (pantryId: number) => {
         const prods = products[pantryId] || []
-        if (!cleanSearch) return prods
-        return prods.filter((p) => p.name.toLowerCase().includes(cleanSearch))
+
+        let result = prods
+        if (cleanSearch) {
+            result = prods.filter((p) => p.name.toLocaleLowerCase().includes(cleanSearch))
+        }
+
+        if (nameSort === 'none' && qtySort === 'none') return result
+
+        return [...result].sort((a,b) => {
+            
+            let primaryComparison = 0
+
+            if(qtySort === 'qty-desc') {
+                primaryComparison = b.quantity - a.quantity
+            } else if(qtySort === 'qty-asc') {
+                primaryComparison = a.quantity - b.quantity
+            }
+
+            if (primaryComparison !== 0 ){
+                return primaryComparison
+            }
+
+            if (nameSort === 'name-asc') {
+                return a.name.localeCompare(b.name)
+            } else if (nameSort === 'name-desc') {
+                return b.name.localeCompare(a.name)
+            }
+
+            return 0
+
+        })
     }
 
     // Filtriamo le dispense: teniamo quelle che hanno prodotti che matchano
@@ -150,6 +186,8 @@ export default function Dispense() {
 
     // Se stiamo cercando ma visiblePantries è vuoto, non c'è nulla da mostrare in assoluto
     const isSearchEmpty = cleanSearch !== "" && visiblePantries.length === 0;
+
+
 
     return (
         <View style={styles.mainContainer}>
@@ -171,6 +209,11 @@ export default function Dispense() {
             <Filters
                 search={searchPantry}
                 onChangeSearch={setSearchPantry}
+                nameSort={nameSort}
+                onSortNameChange={setNameSort}
+                quantitySort={qtySort}
+                onSortQuantityChange={setQtySort}
+             
             />
 
             {/* ACCORDION CHE VIENE STAMPATO */}
