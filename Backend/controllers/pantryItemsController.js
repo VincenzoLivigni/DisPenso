@@ -141,16 +141,50 @@ exports.getAllPantryItems = async (req, res) => {
                     product.name,
                     product.brand,
                     product.image_url,
-                    product.category
+                    product.category,
+                    product.ingredients,
+                    nutrition.energy_kcal,
+                    nutrition.fat,
+                    nutrition.saturated_fat,
+                    nutrition.carbohydrates,
+                    nutrition.sugars,
+                    nutrition.fiber,
+                    nutrition.proteins,
+                    nutrition.salt
                 FROM pantry_items AS pantryItem
                 JOIN products AS product ON pantryItem.product_id = product.id
+                LEFT JOIN nutrition ON product.id = nutrition.product_id
                 WHERE pantryItem.pantry_id = ?
                 ORDER BY pantryItem.expiration_date IS NULL ASC, pantryItem.expiration_date ASC
         `
 
         const [items] = await db.query(query, [pantryId])
 
-        return res.status(200).json(items)
+        const formattedItems = items.map(i => ({
+            item_id: i.item_id,
+            quantity: i.quantity,
+            expiration_date: i.expiration_date,
+            added_at: i.added_at,
+            product_id: i.product_id,
+            barcode: i.barcode,
+            name: i.name,
+            brand: i.brand,
+            image_url: i.image_url,
+            category: i.category,
+            ingredients: i.ingredients,
+            nutrition: (i.energy_kcal !== null || i.fat !== null) ? {
+                energy_kcal: i.energy_kcal,
+                fat: i.fat,
+                saturated_fat: i.saturated_fat,
+                carbohydrates: i.carbohydrates,
+                sugars: i.sugars,
+                fiber: i.fiber,
+                proteins: i.proteins,
+                salt: i.salt
+            } : null
+        }))
+
+        return res.status(200).json(formattedItems)
 
     } catch (err) {
         console.log(err);

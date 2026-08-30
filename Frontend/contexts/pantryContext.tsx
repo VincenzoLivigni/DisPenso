@@ -37,6 +37,17 @@ export type DataPantryItems = {
   brand: string | null;
   image_url: string | null;
   category: string | null;
+  ingredients: string | null;
+  nutrition: {
+    energy_kcal: number | null;
+    fat: number | null;
+    saturated_fat: number | null;
+    carbohydrates: number | null;
+    sugars: number | null;
+    fiber: number | null;
+    proteins: number | null;
+    salt: number | null;
+  } | null;
 };
 
 type PantryContextType = {
