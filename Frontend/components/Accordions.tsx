@@ -9,6 +9,7 @@ import EditProductModal from "./EditProductModal";
 import DeleteProductModal from "./DeleteProductModal";
 import { DataPantryItems, usePantry } from "../contexts/pantryContext";
 import { expirationBadge } from "../services/utils";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 
 const placeholder = require("../assets/placeholder.png");
 
@@ -66,6 +67,43 @@ export default function Accordions({
     router.push(`/product/${itemId}`);
   };
 
+  // scorri a destra per modificare prodotto
+  const dragLeft = (p: DataPantryItems) => {
+    return (
+      <Pressable
+        style={styles.editAction}
+        onPress={() => {
+          // evita conflittti tra l'animazione dello swipe e l'apertura della modale
+          setTimeout(() => {
+            setSelectedProduct(p);
+            setIsOpenEditModal(true);
+          }, 100);
+        }}
+      >
+        <Octicons name="pencil" size={16} color="white" />
+        <Text style={styles.actionText}>Modifica</Text>
+      </Pressable>
+    )
+  }
+
+  // scorri a sinistra per eliminare prodotto
+  const dragRight = (p: DataPantryItems) => {
+    return (
+      <Pressable
+        style={styles.deleteAction}
+        onPress={() => {
+          setTimeout(() => {
+            setSelectedProductToDelete(p);
+            setIsOpenDeleteModal(true);
+          }, 100);
+        }}
+      >
+        <MaterialIcons name="delete" size={18} color="white" />
+        <Text style={styles.actionText}>Elimina</Text>
+      </Pressable>
+    )
+  }
+
   return (
     <View style={styles.container}>
       <Pressable style={styles.toggle} onPress={() => setIsOpen(!isOpen)}>
@@ -83,49 +121,40 @@ export default function Accordions({
             const badge = expirationBadge(p.expiration_date);
 
             return (
-              <View key={p.item_id} style={styles.card}>
-                <Image
-                  source={p.image_url ? { uri: p.image_url } : placeholder}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-                <View style={styles.infoContainer}>
-                  <Pressable onPress={() => handleOpenDetail(p.item_id)}>
-                    <Text style={styles.productName}>{p.name}</Text>
-                  </Pressable>
+              <Swipeable
+                key={p.item_id}
+                renderLeftActions={() => dragLeft(p)}
+                renderRightActions={() => dragRight(p)}
+                // resistenza dello swipe
+                friction={2}
+                // soglia oltre la quale l'utente deve trascinare la card affinché l'azione si attivi
+                leftThreshold={40}
+                rightThreshold={40}
+              >
+                <View key={p.item_id} style={styles.card}>
+                  <Image
+                    source={p.image_url ? { uri: p.image_url } : placeholder}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                  <View style={styles.infoContainer}>
+                    <Pressable onPress={() => handleOpenDetail(p.item_id)}>
+                      <Text style={styles.productName}>{p.name}</Text>
+                    </Pressable>
 
-                  <Text style={styles.info}>{p.quantity} pz</Text>
-                  <View style={[styles.badge, {
-                    backgroundColor: badge.bg,
-                    borderLeftColor: badge.border,
-                    borderRightColor: badge.border
-                  }]}>
-                    <Text style={[styles.badgeText, { color: badge.color }]}>
-                      {badge.text}
-                    </Text>
+                    <Text style={styles.info}>{p.quantity} pz</Text>
+                    <View style={[styles.badge, {
+                      backgroundColor: badge.bg,
+                      borderLeftColor: badge.border,
+                      borderRightColor: badge.border
+                    }]}>
+                      <Text style={[styles.badgeText, { color: badge.color }]}>
+                        {badge.text}
+                      </Text>
+                    </View>
                   </View>
                 </View>
-
-                <View style={styles.actions}>
-                  <Pressable
-                    onPress={() => {
-                      setSelectedProduct(p);
-                      setIsOpenEditModal(true);
-                    }}
-                  >
-                    <Octicons name="pencil" size={20} color="black" />
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => {
-                      setSelectedProductToDelete(p);
-                      setIsOpenDeleteModal(true);
-                    }}
-                  >
-                    <MaterialIcons name="delete" size={22} color="black" />
-                  </Pressable>
-                </View>
-              </View>
+              </Swipeable>
             )
           })}
         </View>
@@ -177,10 +206,10 @@ const styles = StyleSheet.create({
     borderTopColor: "#ccc",
   },
   card: {
+    backgroundColor: "white",
     padding: 8,
     borderWidth: 1,
     borderColor: "#6e6e6e",
-    borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -213,4 +242,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
   },
-});
+  editAction: {
+    backgroundColor: "#3baecb",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 60,
+    height: 80.5,
+    borderTopStartRadius: 8,
+    borderBottomStartRadius: 8,
+  },
+  deleteAction: {
+    backgroundColor: "#ef4444",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 60,
+    height: 80.5,
+    borderTopEndRadius: 8,
+    borderBottomEndRadius: 8,
+  },
+  actionText: {
+    color: "white",
+    fontSize: 11,
+    fontWeight: "600",
+    marginTop: 4,
+    textAlign: "center",
+  }
+})
