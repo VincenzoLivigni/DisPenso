@@ -8,6 +8,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import EditProductModal from "./EditProductModal";
 import DeleteProductModal from "./DeleteProductModal";
 import { DataPantryItems, usePantry } from "../contexts/pantryContext";
+import { expirationBadge } from "../services/utils";
 
 const placeholder = require("../assets/placeholder.png");
 
@@ -30,13 +31,11 @@ export default function Accordions({
 
   const [isOpen, setIsOpen] = useState(false);
   // stati modifica prodotto
-  const [selectedProduct, setSelectedProduct] =
-    useState<DataPantryItems | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<DataPantryItems | null>(null);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
 
   // stati elimina prodotto
-  const [selectedProductToDelete, setSelectedProductToDelete] =
-    useState<DataPantryItems | null>(null);
+  const [selectedProductToDelete, setSelectedProductToDelete] = useState<DataPantryItems | null>(null);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
   const cleanSearch = search.toLowerCase().trim();
@@ -80,51 +79,55 @@ export default function Accordions({
 
       {autoOpen && (
         <View style={styles.accordionContainer}>
-          {products.map((p) => (
-            <View key={p.item_id} style={styles.card}>
-              <Image
-                source={p.image_url ? { uri: p.image_url } : placeholder}
-                style={styles.image}
-                resizeMode="cover"
-              />
-              <View style={styles.infoContainer}>
-                <Pressable onPress={() => handleOpenDetail(p.item_id)}>
-                  <Text style={styles.productName}>{p.name}</Text>
-                </Pressable>
+          {products.map((p) => {
+            const badge = expirationBadge(p.expiration_date);
 
-                <Text style={styles.info}>{p.quantity}</Text>
-                <Text style={styles.info}>
-                  {p.expiration_date
-                    ? p.expiration_date
-                        .split("T")[0]
-                        .split("-")
-                        .reverse()
-                        .join("/")
-                    : ""}
-                </Text>
+            return (
+              <View key={p.item_id} style={styles.card}>
+                <Image
+                  source={p.image_url ? { uri: p.image_url } : placeholder}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+                <View style={styles.infoContainer}>
+                  <Pressable onPress={() => handleOpenDetail(p.item_id)}>
+                    <Text style={styles.productName}>{p.name}</Text>
+                  </Pressable>
+
+                  <Text style={styles.info}>{p.quantity} pz</Text>
+                  <View style={[styles.badge, {
+                    backgroundColor: badge.bg,
+                    borderLeftColor: badge.border,
+                    borderRightColor: badge.border
+                  }]}>
+                    <Text style={[styles.badgeText, { color: badge.color }]}>
+                      {badge.text}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.actions}>
+                  <Pressable
+                    onPress={() => {
+                      setSelectedProduct(p);
+                      setIsOpenEditModal(true);
+                    }}
+                  >
+                    <Octicons name="pencil" size={20} color="black" />
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      setSelectedProductToDelete(p);
+                      setIsOpenDeleteModal(true);
+                    }}
+                  >
+                    <MaterialIcons name="delete" size={22} color="black" />
+                  </Pressable>
+                </View>
               </View>
-
-              <View style={styles.actions}>
-                <Pressable
-                  onPress={() => {
-                    setSelectedProduct(p);
-                    setIsOpenEditModal(true);
-                  }}
-                >
-                  <Octicons name="pencil" size={20} color="black" />
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    setSelectedProductToDelete(p);
-                    setIsOpenDeleteModal(true);
-                  }}
-                >
-                  <MaterialIcons name="delete" size={22} color="black" />
-                </Pressable>
-              </View>
-            </View>
-          ))}
+            )
+          })}
         </View>
       )}
 
@@ -197,5 +200,17 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     gap: 10,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+    borderLeftWidth: 3,
+    borderRightWidth: 3
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: "700",
   },
 });

@@ -6,6 +6,7 @@ import Header from "../../components/Header";
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 const placeholder = require("../../assets/placeholder.png");
+import { expirationBadge } from "../../services/utils";
 
 export default function DettaglioProdotto() {
   // Estraiamo l'ID dall'URL della rotta
@@ -14,6 +15,8 @@ export default function DettaglioProdotto() {
   const router = useRouter()
 
   const product = getProductById(Number(id));
+
+  const badge = expirationBadge(product?.expiration_date);
 
   return (
     <>
@@ -27,7 +30,7 @@ export default function DettaglioProdotto() {
               product?.image_url ? { uri: product?.image_url } : placeholder
             }
             style={styles.image}
-            resizeMode="cover"
+            resizeMode="contain"
           />
         </View>
 
@@ -37,15 +40,15 @@ export default function DettaglioProdotto() {
 
         <View style={styles.infoProduct}>
           <Text style={styles.label}>Scadenza:</Text>
-          <Text style={styles.value}>
-            {product?.expiration_date
-              ? product.expiration_date
-                .split("T")[0]
-                .split("-")
-                .reverse()
-                .join("/")
-              : "-"}
-          </Text>
+          <View style={[styles.badge, {
+            backgroundColor: badge.bg,
+            borderLeftColor: badge.border,
+            borderRightColor: badge.border
+          }]}>
+            <Text style={[styles.badgeText, { color: badge.color }]}>
+              {badge.text}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.infoProduct}>
@@ -240,5 +243,17 @@ const styles = StyleSheet.create({
     fontWeight: 600,
     color: "white",
     marginLeft: 8,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+    borderLeftWidth: 3,
+    borderRightWidth: 3
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: "700",
   },
 });
