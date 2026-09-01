@@ -5,42 +5,43 @@ import {
     Text,
     FlatList,
     StyleSheet,
+    Pressable,
     ActivityIndicator,
     Image
 } from "react-native";
+import { useRouter } from "expo-router";
+import { expirationBadge } from "../services/utils";
 
-
+const placeholder = require("../assets/placeholder.png");
 
 type product = {
     id: string | number;
     name: string;
     image_url: string | null;
+    quantity: number;
+    expiration_date: string;
+    pantry: {
+        id: string | number;
+        name: string;
+    }
 }
 
 export default function Carosello() {
-    const [loading, setLoading] = useState(false)
-    const [products, setProducts] = useState<product[]>([])
-
-    type dataExpiring = {
-        "id": String,
-        "name": String,
-        "brand": String | null,
-        "image_url": String | null,
-        "quantity": Number,
-        "expiration_date": String,
-        "daysLeft": Number,
-        "pantry": {
-            "id": String,
-            "name": String
-        }
-    }
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [products, setProducts] = useState<product[]>([]);
 
     async function loadExpiring() {
         try {
             setLoading(true)
             const data = await allExpiringProducts()
-            setProducts(data)
 
+            // prodotti nel carosello ordinati per scadenza
+            const sortedData = data.sort((a: product, b: product) => {
+                return new Date(a.expiration_date).getTime() - new Date(b.expiration_date).getTime();
+            })
+
+            setProducts(sortedData)
         }
         catch (err) {
             console.log(err, 'errore nel recupero delle scadenze');
@@ -50,31 +51,59 @@ export default function Carosello() {
     }
 
     useEffect(() => {
-        allExpiringProducts().then(setProducts).catch(console.log);
+        loadExpiring()
     }, []);
 
     return (
-        <FlatList
-            horizontal
-            data={products}
-            keyExtractor={(item) => item.id.toString()}
-            style={styles.carosello}
-            renderItem={({ item }) => (
-                <View style={styles.card}>
-                    <Image source={{ uri: item.image_url || "" }} style={styles.image} />
+        <View style={styles.carosello}>
+            <FlatList
+                horizontal
+                data={products}
+                keyExtractor={(item) => item.id.toString()}
+                showsHorizontalScrollIndicator={true}
+                renderItem={({ item }) => {
 
-                    <View style={styles.cardRight}>
-                        <Text numberOfLines={2} style={styles.title}>{item.name}</Text>
-                    </View>
-                </View>
-            )}
-        />
-    );
+                    const badge = expirationBadge(item.expiration_date);
+
+
+                    return (
+                        <View style={styles.card}>
+                            <Pressable
+                                style={styles.cardContent}
+                                onPress={() => router.push("/Dispense")}
+                            >
+                                <Image source={item.image_url ? { uri: item.image_url } : placeholder}
+                                    style={styles.image}
+                                    resizeMode="cover"
+                                />
+
+                                <View style={styles.cardRight}>
+                                    <Text numberOfLines={1} style={styles.title}>{item.name}</Text>
+
+                                    <Text style={styles.info}>{item.quantity} pz</Text>
+
+                                    <View style={[styles.badge, {
+                                        backgroundColor: badge.bg,
+                                        borderLeftColor: badge.border,
+                                        borderRightColor: badge.border
+                                    }]}>
+                                        <Text style={[styles.badgeText, { color: badge.color }]}>
+                                            {badge.text}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </Pressable>
+                        </View>
+                    )
+                }}
+            />
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
     carosello: {
-        margin: 15
+        margin: 14,
     },
     card: {
         width: 150,
@@ -86,14 +115,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     image: {
-        width: 50,
-        height: 50,
+        width: 61,
+        height: 61,
         backgroundColor: "#f3f3f3",
-        marginBottom: 5,
         borderRadius: 8,
     },
     cardRight: {
         marginLeft: 8,
+        gap: 2,
         flex: 1,
         justifyContent: "center",
     },
@@ -101,6 +130,27 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: 600,
         color: "#3baecb",
-        textAlign: "center",
+    },
+    cardContent: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+    },
+    info: {
+        fontSize: 11,
+        color: "#6e6e6e",
+        marginBottom: 4,
+    },
+    badge: {
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
+        alignSelf: "flex-start",
+        borderLeftWidth: 2,
+        borderRightWidth: 2,
+    },
+    badgeText: {
+        fontSize: 10,
+        fontWeight: "700",
     },
 });

@@ -236,7 +236,7 @@ exports.expiringItems = async (req, res) => {
 //SCADENZE DI TUTTI I MIEI PRODOTTI
 exports.expiringItemsGetAll = async (req, res) => {
     const userId = req.user.id;
-    const days = parseInt(req.query.days) || 7;
+    const days = parseInt(req.query.days) || 90;
 
     try {
         const [items] = await db.query(
