@@ -13,8 +13,14 @@ import Filters from "../../components/FIlters";
 
 import { usePantry } from "../../contexts/pantryContext";
 
-export type NameSortOption = "none" | "name-asc" | "name-desc";
-export type QtySortOption = "none" | "qty-asc" | "qty-desc";
+export type SortOption =
+  | "none"
+  | "name-asc"
+  | "name-desc"
+  | "qty-asc"
+  | "qty-desc";
+// export type NameSortOption = "none" | "name-asc" | "name-desc";
+// export type QtySortOption = "none" | "qty-asc" | "qty-desc";
 
 export default function Dispense() {
   const { pantries, products, createPantry } = usePantry();
@@ -22,8 +28,9 @@ export default function Dispense() {
   const [newPantry, setNewPantry] = useState("");
   const [searchPantry, setSearchPantry] = useState("");
 
-  const [nameSort, setNameSort] = useState<NameSortOption>("none");
-  const [qtySort, setQtySort] = useState<QtySortOption>("none");
+  const [sort, setSort] = useState<SortOption>("none");
+  // const [nameSort, setNameSort] = useState<NameSortOption>("none");
+  // const [qtySort, setQtySort] = useState<QtySortOption>("none");
 
   const handleCreatePantry = async () => {
     if (newPantry.trim().length < 3) {
@@ -46,14 +53,14 @@ export default function Dispense() {
       );
     }
 
-    if (nameSort === "none" && qtySort === "none") return result;
+    if (sort === "none") return result;
 
     return [...result].sort((a, b) => {
       let primaryComparison = 0;
 
-      if (qtySort === "qty-desc") {
+      if (sort === "qty-desc") {
         primaryComparison = b.quantity - a.quantity;
-      } else if (qtySort === "qty-asc") {
+      } else if (sort === "qty-asc") {
         primaryComparison = a.quantity - b.quantity;
       }
 
@@ -61,9 +68,9 @@ export default function Dispense() {
         return primaryComparison;
       }
 
-      if (nameSort === "name-asc") {
+      if (sort === "name-asc") {
         return a.name.localeCompare(b.name);
-      } else if (nameSort === "name-desc") {
+      } else if (sort === "name-desc") {
         return b.name.localeCompare(a.name);
       }
 
@@ -101,10 +108,12 @@ export default function Dispense() {
       <Filters
         search={searchPantry}
         onChangeSearch={setSearchPantry}
-        nameSort={nameSort}
-        onSortNameChange={setNameSort}
-        quantitySort={qtySort}
-        onSortQuantityChange={setQtySort}
+        sort={sort}
+        onSortChange={setSort}
+        // nameSort={nameSort}
+        // onSortNameChange={setNameSort}
+        // quantitySort={qtySort}
+        // onSortQuantityChange={setQtySort}
       />
 
       {/* ACCORDION CHE VIENE STAMPATO */}

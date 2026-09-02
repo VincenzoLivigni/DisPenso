@@ -7,29 +7,34 @@ import {
   Pressable,
   TouchableOpacity,
 } from "react-native";
-import { NameSortOption, QtySortOption } from "../app/(tabs)/Dispense";
+import { SortOption } from "../app/(tabs)/Dispense";
 
 type FiltersProps = {
   search: string;
   onChangeSearch: (text: string) => void;
-  nameSort: NameSortOption;
-  quantitySort: QtySortOption;
-  onSortNameChange: (sort: NameSortOption) => void;
-  onSortQuantityChange: (sort: QtySortOption) => void;
+  sort: SortOption;
+  // nameSort: NameSortOption;
+  // quantitySort: QtySortOption;
+  onSortChange: (sort: SortOption) => void;
+  // onSortNameChange: (sort: NameSortOption) => void;
+  // onSortQuantityChange: (sort: QtySortOption) => void;
 };
 
 export default function Filters({
   search,
   onChangeSearch,
-  nameSort,
-  quantitySort,
-  onSortNameChange,
-  onSortQuantityChange,
+  sort,
+  onSortChange,
+  // nameSort,
+  // quantitySort,
+  // onSortNameChange,
+  // onSortQuantityChange,
 }: FiltersProps) {
   function reset() {
     onChangeSearch("");
-    onSortNameChange("none");
-    onSortQuantityChange("none");
+    onSortChange("none");
+    // onSortNameChange("none");
+    // onSortQuantityChange("none");
   }
 
   return (
@@ -56,50 +61,34 @@ export default function Filters({
         {/* BOTTONI PER IL SORT */}
         <View style={styles.actionContainer}>
           <Pressable
-            style={[
-              styles.button,
-              nameSort === "name-asc" && styles.activeButton,
-            ]}
+            style={[styles.button, sort === "name-asc" && styles.activeButton]}
             onPress={() =>
-              onSortNameChange(nameSort === "name-asc" ? "none" : "name-asc")
+              onSortChange(sort === "name-asc" ? "none" : "name-asc")
             }
           >
             <Text style={styles.textButton}>A - Z</Text>
           </Pressable>
           <Pressable
-            style={[
-              styles.button,
-              nameSort === "name-desc" && styles.activeButton,
-            ]}
+            style={[styles.button, sort === "name-desc" && styles.activeButton]}
             onPress={() =>
-              onSortNameChange(nameSort === "name-desc" ? "none" : "name-desc")
+              onSortChange(sort === "name-desc" ? "none" : "name-desc")
             }
           >
             <Text style={styles.textButton}>Z - A</Text>
           </Pressable>
 
           <Pressable
-            style={[
-              styles.button,
-              quantitySort === "qty-desc" && styles.activeButton,
-            ]}
+            style={[styles.button, sort === "qty-desc" && styles.activeButton]}
             onPress={() =>
-              onSortQuantityChange(
-                quantitySort === "qty-desc" ? "none" : "qty-desc",
-              )
+              onSortChange(sort === "qty-desc" ? "none" : "qty-desc")
             }
           >
             <Text style={styles.textButton}>Quantità +</Text>
           </Pressable>
           <Pressable
-            style={[
-              styles.button,
-              quantitySort === "qty-asc" && styles.activeButton,
-            ]}
+            style={[styles.button, sort === "qty-asc" && styles.activeButton]}
             onPress={() =>
-              onSortQuantityChange(
-                quantitySort === "qty-asc" ? "none" : "qty-asc",
-              )
+              onSortChange(sort === "qty-asc" ? "none" : "qty-asc")
             }
           >
             <Text style={styles.textButton}>Quantità -</Text>
