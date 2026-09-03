@@ -87,14 +87,92 @@ export async function createNewPantry(nomeNuovaDispensa: string) {
 }
 
 
-// ACCETTA MEMBRO NELLA DISPENSA  ❌
+// ACCETTA MEMBRO NELLA DISPENSA ✅
+export async function acceptMember(
+    pantryId: number,
+    memberId: number) {
 
-// RICHIESTA UNIONE A DISPENSA ❌
+    const authHeaders = await auth();
 
-// RECUPERA MEMBRI DISPENSA  ❌
+    const res = await fetch(`${API}/pantries/${pantryId}/members/${memberId}/accept`, {
+        method: "PATCH",
+        headers: {
+            ...authHeaders,
+            "Content-Type": "application/json"
+        },
+    })
 
-// GESTIONE RIMOZIONE MEMBRI DISPENSA ❌
+    const data = await res.json()
 
+    if (!res.ok) throw new Error(data.message || "Errore durante l'accettazione di un nuovo membro")
+
+    return data
+}
+
+// RICHIESTA UNIONE A DISPENSA ✅
+export async function joinPantry(inviteCode: string) {
+
+    const res = await fetch(`${API}/pantries/join`, {
+        method: "POST",
+        headers: await auth(),
+        body: JSON.stringify({ invite_code: inviteCode })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore durante la richiesta di unione alla dispensa")
+
+    return data
+}
+
+// RECUPERA MEMBRI DISPENSA  ✅
+export async function pantryMembers(pantryId: number) {
+
+    const res = await fetch(`${API}/pantries/${pantryId}/members`, {
+        method: "GET",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || `Errore nel recuperare i membri della dispensa`)
+
+    return data
+}
+
+
+// GESTIONE RIMOZIONE MEMBRI DISPENSA ✅
+export async function deleteMember(
+    pantryId: number,
+    memberId: number) {
+
+    const res = await fetch(`${API}/pantries/${pantryId}/members/${memberId}`, {
+        method: "DELETE",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore durante l'eliminazione di un membro")
+
+    return data
+}
+
+// ABBANDONA DISPENSA (elimina prodotti e membri al suo interno) ✅
+export async function deletePantry(
+    pantryId: number) {
+
+    const res = await fetch(`${API}/pantries/${pantryId}/leave`, {
+        method: "DELETE",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore durante l'abbandono della dispensa")
+
+    return data
+}
 
 
 /*
