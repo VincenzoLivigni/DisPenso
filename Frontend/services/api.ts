@@ -112,7 +112,7 @@ export async function acceptMember(
 // RICHIESTA UNIONE A DISPENSA ✅
 export async function joinPantry(inviteCode: string) {
 
-    const res = await fetch(`${API}/pantries/join`, {
+    const res = await fetch(`${API}/pantry/pantries/join`, {
         method: "POST",
         headers: await auth(),
         body: JSON.stringify({ invite_code: inviteCode })

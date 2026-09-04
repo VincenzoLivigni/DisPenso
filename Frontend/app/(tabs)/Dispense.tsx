@@ -23,15 +23,18 @@ export type SortOption =
 // export type QtySortOption = "none" | "qty-asc" | "qty-desc";
 
 export default function Dispense() {
-  const { pantries, products, createPantry } = usePantry();
+  const { pantries, products, createPantry, handleJoinPantry } = usePantry();
 
   const [newPantry, setNewPantry] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+
   const [searchPantry, setSearchPantry] = useState("");
 
   const [sort, setSort] = useState<SortOption>("none");
   // const [nameSort, setNameSort] = useState<NameSortOption>("none");
   // const [qtySort, setQtySort] = useState<QtySortOption>("none");
 
+  // crea nuova dispensa
   const handleCreatePantry = async () => {
     if (newPantry.trim().length < 3) {
       return Alert.alert("Nome dipensa non valido");
@@ -39,6 +42,13 @@ export default function Dispense() {
     await createPantry(newPantry.trim());
     setNewPantry("");
   };
+
+  // aggiungi membro a dispensa
+  const onJoinSubmit = async () => {
+    if (!joinCode) return
+    await handleJoinPantry(joinCode)
+    setJoinCode("")
+  }
 
   const cleanSearch = searchPantry.toLowerCase().trim();
 
@@ -91,9 +101,11 @@ export default function Dispense() {
 
   return (
     <View style={styles.mainContainer}>
+      {/* crea nuova dispensa */}
+      <Text style={{ marginStart: 13, marginTop: 10 }}>Aggiungi una nuova dispensa</Text>
       <View style={styles.createdContainer}>
         <TextInput
-          placeholder="Aggiungi una nuova dispensa"
+          placeholder="Inserisci il nome della dispensa"
           value={newPantry}
           onChangeText={setNewPantry}
           style={styles.input}
@@ -104,16 +116,27 @@ export default function Dispense() {
         </Pressable>
       </View>
 
+      {/* entra in una dispensa */}
+      <Text style={{ marginStart: 13, marginTop: 10 }}>Entra in una dispensa già esistente</Text>
+      <View style={styles.createdContainer}>
+        <TextInput
+          placeholder="inserisci codice d'invito"
+          value={joinCode}
+          onChangeText={setJoinCode}
+          style={styles.input}
+        />
+
+        <Pressable style={styles.button} onPress={onJoinSubmit}>
+          <Text style={styles.textButton}>Unisciti</Text>
+        </Pressable>
+      </View>
+
       {/* SEARCH BAR PER FILTRARE */}
       <Filters
         search={searchPantry}
         onChangeSearch={setSearchPantry}
         sort={sort}
         onSortChange={setSort}
-        // nameSort={nameSort}
-        // onSortNameChange={setNameSort}
-        // quantitySort={qtySort}
-        // onSortQuantityChange={setQtySort}
       />
 
       {/* ACCORDION CHE VIENE STAMPATO */}
@@ -151,7 +174,7 @@ const styles = StyleSheet.create({
   },
   createdContainer: {
     marginHorizontal: 13,
-    marginVertical: 15,
+    marginVertical: 10,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,

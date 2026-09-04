@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct,
   pantryMembers,
+  joinPantry,
   acceptMember,
   deleteMember,
   deletePantry
@@ -77,6 +78,7 @@ type PantryContextType = {
   ) => Promise<void>;
   handleDeleteProduct: (pantryId: number, itemId: number) => Promise<void>;
   getProductById: (itemId: number) => DataPantryItems | undefined;
+  handleJoinPantry: (inviteCode: string) => Promise<void>;
   handleAcceptMember: (pantryId: number, memberId: number) => Promise<void>;
   handleRemoveMember: (pantryId: number, memberId: number) => Promise<void>;
   handleDeletePantry: (pantryId: number) => Promise<void>;
@@ -196,6 +198,27 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
     return undefined;
   };
 
+  // AGGIUNGI MEMBRO A DISPENSA
+  const handleJoinPantry = async (inviteCode: string) => {
+    try {
+      if (!inviteCode.trim()) {
+        Alert.alert("Codice d'invito non valido");
+        return;
+      }
+
+      await joinPantry(inviteCode.trim())
+      Alert.alert(
+        "Richiesta Inviata",
+        "La tua richiesta è in attesa di approvazione da parte del proprietario."
+      );
+      await loadPantries();
+    }
+    catch (err) {
+      console.log("Errore", err);
+      Alert.alert("Errore", "Impossibile unirsi alla dispensa");
+    }
+  }
+
   //ACCETTA MEMBRO
   const handleAcceptMember = async (pantryId: number, memberId: number) => {
     try {
@@ -280,6 +303,7 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
         handleDeleteProduct,
         getProductById,
         pantryMembersDetails,
+        handleJoinPantry,
         handleAcceptMember,
         handleRemoveMember,
         handleDeletePantry
