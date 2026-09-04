@@ -94,7 +94,7 @@ export async function acceptMember(
 
     const authHeaders = await auth();
 
-    const res = await fetch(`${API}/pantries/${pantryId}/members/${memberId}/accept`, {
+    const res = await fetch(`${API}/pantry/pantries/${pantryId}/members/${memberId}/accept`, {
         method: "PATCH",
         headers: {
             ...authHeaders,
@@ -146,7 +146,7 @@ export async function deleteMember(
     pantryId: number,
     memberId: number) {
 
-    const res = await fetch(`${API}/pantries/${pantryId}/members/${memberId}`, {
+    const res = await fetch(`${API}/pantry/pantries/${pantryId}/members/${memberId}`, {
         method: "DELETE",
         headers: await auth()
     })
@@ -158,11 +158,11 @@ export async function deleteMember(
     return data
 }
 
-// ABBANDONA DISPENSA (elimina prodotti e membri al suo interno) ✅
+// ELIMINA DISPENSA (elimina prodotti e membri al suo interno) ✅
 export async function deletePantry(
     pantryId: number) {
 
-    const res = await fetch(`${API}/pantries/${pantryId}/leave`, {
+    const res = await fetch(`${API}/pantry/pantries/${pantryId}/leave`, {
         method: "DELETE",
         headers: await auth()
     })

@@ -24,11 +24,17 @@ export default function PantryMembersModal({
 }: PantryMembersModalProps) {
   const { id, name, invite_code } = pantry;
 
-  const { pantryMembersDetails } = usePantry();
+  const { pantryMembersDetails, handleAcceptMember, handleRemoveMember, handleDeletePantry } = usePantry();
   const members = pantryMembersDetails[id] || [];
 
   const pendingMembers = members.filter((m) => m.status === "pending");
   const acceptedMembers = members.filter((m) => m.status === "accepted");
+
+  // funzione elimina dispensa e chiude modale
+  function deletePantry(id: number) {
+    handleDeletePantry(id)
+    onCloseModal()
+  }
 
   return (
     <Modal visible={isOpenModal} transparent={true}>
@@ -49,10 +55,10 @@ export default function PantryMembersModal({
                 <View key={m.id} style={styles.sectionRow}>
                   <Text style={styles.users}>{m.email}</Text>
                   <View style={styles.actionButtons}>
-                    <Pressable style={styles.acceptBtn}>
+                    <Pressable onPress={() => handleAcceptMember(pantry.id, m.id)} style={styles.acceptBtn}>
                       <MaterialIcons name="check" size={16} color="white" />
                     </Pressable>
-                    <Pressable style={styles.rejectBtn}>
+                    <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={styles.rejectBtn}>
                       <MaterialIcons name="close" size={16} color="white" />
                     </Pressable>
                   </View>
@@ -66,7 +72,7 @@ export default function PantryMembersModal({
               {acceptedMembers.map((m) => (
                 <View key={m.id} style={styles.sectionRow}>
                   <Text style={styles.users}>{m.email}</Text>
-                  <Pressable style={{ marginLeft: 10 }}>
+                  <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={{ marginLeft: 10 }}>
                     <MaterialIcons
                       name="delete-outline"
                       size={20}
@@ -80,7 +86,7 @@ export default function PantryMembersModal({
 
           {/* azioni */}
           <View style={styles.footerButtons}>
-            <Pressable style={styles.deleteButton}>
+            <Pressable onPress={() => deletePantry(pantry.id)} style={styles.deleteButton}>
               <Text style={styles.textButton}>Elimina Dispensa</Text>
             </Pressable>
             <Pressable onPress={onCloseModal} style={styles.nullButton}>

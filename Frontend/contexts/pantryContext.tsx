@@ -6,6 +6,9 @@ import {
   updateProduct,
   deleteProduct,
   pantryMembers,
+  acceptMember,
+  deleteMember,
+  deletePantry
 } from "../services/api";
 
 import React, {
@@ -74,6 +77,9 @@ type PantryContextType = {
   ) => Promise<void>;
   handleDeleteProduct: (pantryId: number, itemId: number) => Promise<void>;
   getProductById: (itemId: number) => DataPantryItems | undefined;
+  handleAcceptMember: (pantryId: number, memberId: number) => Promise<void>;
+  handleRemoveMember: (pantryId: number, memberId: number) => Promise<void>;
+  handleDeletePantry: (pantryId: number) => Promise<void>;
 };
 
 const PantryContext = createContext<PantryContextType | undefined>(undefined);
@@ -190,6 +196,73 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
     return undefined;
   };
 
+  //ACCETTA MEMBRO
+  const handleAcceptMember = async (pantryId: number, memberId: number) => {
+    try {
+      await acceptMember(pantryId, memberId);
+
+      // aggiunta nuovo membro alla dispensa
+      setPantryMembersDetails((prevDetails) => ({
+        ...prevDetails,
+        [pantryId]: (prevDetails[pantryId] || []).map((member) => member.id === memberId
+          ? { ...member, status: "accepted" }
+          : member
+        ),
+      }))
+
+    } catch (err) {
+      console.log("Errore", err);
+      Alert.alert("Errore", "Impossibile accettare il membro nella dispensa");
+    }
+  }
+
+
+  //RIMUOVI MEMBRO DALLA DISPENSA
+  const handleRemoveMember = async (pantryId: number, memberId: number) => {
+    try {
+      await deleteMember(pantryId, memberId);
+
+      // elimina membro dalla dispensa
+      setPantryMembersDetails((prevDetails) => ({
+        ...prevDetails,
+        [pantryId]: (prevDetails[pantryId] || []).filter((member) => member.id !== memberId
+        ),
+      }))
+
+    } catch (err) {
+      console.log("Errore", err);
+      Alert.alert("Errore", "Impossibile rimuovere il membro dalla dispensa");
+    }
+  }
+
+  //ELIMINA DISPENSA
+  const handleDeletePantry = async (pantryId: number) => {
+    try {
+      await deletePantry(pantryId);
+
+      // elimina la dispensa dalla lista
+      setPantries((prev) => prev.filter((p) => p.id !== pantryId))
+
+      // rimozione dei membri appartenenti alla dispensa
+      setPantryMembersDetails((prev) => {
+        const updated = { ...prev }
+        delete updated[pantryId]
+        return updated
+      })
+
+      // rimozione dei prodotti dalla dispensa
+      setProducts((prev) => {
+        const updated = { ...prev }
+        delete updated[pantryId]
+        return updated
+      })
+
+    } catch (err) {
+      console.log("Errore", err);
+      Alert.alert("Errore", "Impossibile eliminare la dispensa");
+    }
+  }
+
   //CHIAMO TUTTE LE DISPENSE CON I PRODOTTI
   useEffect(() => {
     loadPantries();
@@ -207,6 +280,9 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
         handleDeleteProduct,
         getProductById,
         pantryMembersDetails,
+        handleAcceptMember,
+        handleRemoveMember,
+        handleDeletePantry
       }}
     >
       {children}
