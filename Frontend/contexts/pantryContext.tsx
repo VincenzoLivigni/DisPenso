@@ -5,6 +5,7 @@ import {
   pantryProducts,
   updateProduct,
   deleteProduct,
+  pantryMembers,
 } from "../services/api";
 
 import React, {
@@ -50,9 +51,18 @@ export type DataPantryItems = {
   } | null;
 };
 
+//dettaglio del membro dentro la dispensa
+export type DataPantryMembers = {
+  id: number;
+  email: string;
+  role: string;
+  status: string;
+};
+
 type PantryContextType = {
   pantries: DataPantries[];
   products: { [pantryId: number]: DataPantryItems[] };
+  pantryMembersDetails: { [pantryId: number]: DataPantryMembers[] };
   loading: boolean;
   loadPantries: () => Promise<void>;
   createPantry: (name: string) => Promise<void>;
@@ -75,6 +85,10 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
     [pantryId: number]: DataPantryItems[];
   }>({});
 
+  const [pantryMembersDetails, setPantryMembersDetails] = useState<{
+    [pantryId: number]: DataPantryMembers[];
+  }>({});
+
   // RECUPERA TUTTE LE DISPENSE E TUTTI I PRODOTTI
   async function loadPantries() {
     try {
@@ -83,6 +97,7 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
       setPantries(data);
 
       const productsMap: { [key: number]: DataPantryItems[] } = {};
+      const memberMap: { [key: number]: DataPantryMembers[] } = {};
       await Promise.all(
         data.map(async (pantry) => {
           try {
@@ -91,9 +106,17 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
           } catch (err) {
             productsMap[pantry.id] = [];
           }
+
+          try {
+            const dataMembers = await pantryMembers(pantry.id);
+            memberMap[pantry.id] = dataMembers || [];
+          } catch (err) {
+            memberMap[pantry.id] = [];
+          }
         }),
       );
       setProducts(productsMap);
+      setPantryMembersDetails(memberMap);
     } catch (err) {
       console.log(err);
     } finally {
@@ -183,6 +206,7 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
         handleUpdateProduct,
         handleDeleteProduct,
         getProductById,
+        pantryMembersDetails,
       }}
     >
       {children}

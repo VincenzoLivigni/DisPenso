@@ -128,7 +128,7 @@ export async function joinPantry(inviteCode: string) {
 // RECUPERA MEMBRI DISPENSA  ✅
 export async function pantryMembers(pantryId: number) {
 
-    const res = await fetch(`${API}/pantries/${pantryId}/members`, {
+    const res = await fetch(`${API}/pantry/pantries/${pantryId}/members`, {
         method: "GET",
         headers: await auth()
     })

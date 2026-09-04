@@ -4,27 +4,31 @@ import { useRouter } from "expo-router";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import EditProductModal from "./EditProductModal";
 import DeleteProductModal from "./DeleteProductModal";
-import { DataPantryItems, usePantry } from "../contexts/pantryContext";
+import {
+  DataPantries,
+  DataPantryItems,
+  usePantry,
+} from "../contexts/pantryContext";
 import { expirationBadge } from "../services/utils";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import PantryMembersModal from "./PantryMembersModal";
 
 const placeholder = require("../assets/placeholder.png");
 
 type AccordionProps = {
-  nomeDispensa: string;
-  pantryId: number;
+  pantry: DataPantries;
   search: string;
   products: DataPantryItems[];
 };
 
 export default function Accordions({
-  nomeDispensa,
   search,
   products,
-  pantryId,
+  pantry,
 }: AccordionProps) {
   const router = useRouter();
   //Prendiamo dal context le funzioni per salvare ed eliminare il prodotto
@@ -32,12 +36,18 @@ export default function Accordions({
 
   const [isOpen, setIsOpen] = useState(false);
   // stati modifica prodotto
-  const [selectedProduct, setSelectedProduct] = useState<DataPantryItems | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<DataPantryItems | null>(null);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
 
   // stati elimina prodotto
-  const [selectedProductToDelete, setSelectedProductToDelete] = useState<DataPantryItems | null>(null);
+  const [selectedProductToDelete, setSelectedProductToDelete] =
+    useState<DataPantryItems | null>(null);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+
+  //stati per la modale delle dispense
+  const [isOpenManageMemberModal, setIsOpenManageMemberModals] =
+    useState(false);
 
   const cleanSearch = search.toLowerCase().trim();
   const productMatch = products.length > 0;
@@ -47,7 +57,7 @@ export default function Accordions({
     if (!selectedProduct) return;
     //prendo la funzione dal context
     await handleUpdateProduct(
-      pantryId,
+      pantry.id,
       selectedProduct.item_id,
       newQuantity,
       newExpiring,
@@ -57,7 +67,7 @@ export default function Accordions({
   const handleConfirmDelete = async () => {
     if (selectedProductToDelete) {
       //prendo la funzione dal context
-      await handleDeleteProduct(pantryId, selectedProductToDelete.item_id);
+      await handleDeleteProduct(pantry.id, selectedProductToDelete.item_id);
       setIsOpenDeleteModal(false);
       setSelectedProductToDelete(null);
     }
@@ -83,8 +93,8 @@ export default function Accordions({
         <Octicons name="pencil" size={16} color="white" />
         <Text style={styles.actionText}>Modifica</Text>
       </Pressable>
-    )
-  }
+    );
+  };
 
   // scorri a sinistra per eliminare prodotto
   const dragRight = (p: DataPantryItems) => {
@@ -101,18 +111,27 @@ export default function Accordions({
         <MaterialIcons name="delete" size={18} color="white" />
         <Text style={styles.actionText}>Elimina</Text>
       </Pressable>
-    )
-  }
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Pressable style={styles.toggle} onPress={() => setIsOpen(!isOpen)}>
-        <Text style={styles.titlePantry}>{nomeDispensa}</Text>
-        {!autoOpen ? (
-          <MaterialIcons name="keyboard-arrow-down" size={20} color="#6e6e6e" />
-        ) : (
-          <MaterialIcons name="keyboard-arrow-up" size={20} color="#6e6e6e" />
-        )}
+        <Text style={styles.titlePantry}>{pantry.name}</Text>
+        <View style={styles.actions}>
+          <Pressable onPress={() => setIsOpenManageMemberModals(true)}>
+            <FontAwesome name="user" size={18} color="black" />
+          </Pressable>
+          {!autoOpen ? (
+            <MaterialIcons
+              name="keyboard-arrow-down"
+              size={20}
+              color="#6e6e6e"
+            />
+          ) : (
+            <MaterialIcons name="keyboard-arrow-up" size={20} color="#6e6e6e" />
+          )}
+        </View>
       </Pressable>
 
       {autoOpen && (
@@ -127,7 +146,7 @@ export default function Accordions({
                 renderRightActions={() => dragRight(p)}
                 // resistenza dello swipe
                 friction={2}
-                // soglia oltre la quale l'utente deve trascinare la card affinché l'azione si attivi
+                // soglia oltre la quale l'utente deve trascinare la card affinchÃ© l'azione si attivi
                 leftThreshold={40}
                 rightThreshold={40}
               >
@@ -143,11 +162,16 @@ export default function Accordions({
                     </Pressable>
 
                     <Text style={styles.info}>{p.quantity} pz</Text>
-                    <View style={[styles.badge, {
-                      backgroundColor: badge.bg,
-                      borderLeftColor: badge.border,
-                      borderRightColor: badge.border
-                    }]}>
+                    <View
+                      style={[
+                        styles.badge,
+                        {
+                          backgroundColor: badge.bg,
+                          borderLeftColor: badge.border,
+                          borderRightColor: badge.border,
+                        },
+                      ]}
+                    >
                       <Text style={[styles.badgeText, { color: badge.color }]}>
                         {badge.text}
                       </Text>
@@ -155,10 +179,16 @@ export default function Accordions({
                   </View>
                 </View>
               </Swipeable>
-            )
+            );
           })}
         </View>
       )}
+
+      <PantryMembersModal
+        isOpenModal={isOpenManageMemberModal}
+        onCloseModal={() => setIsOpenManageMemberModals(false)}
+        pantry={pantry}
+      />
 
       <EditProductModal
         isOpenEditModal={isOpenEditModal}
@@ -228,7 +258,7 @@ const styles = StyleSheet.create({
   info: {},
   actions: {
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
   badge: {
     paddingHorizontal: 8,
@@ -236,7 +266,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: "flex-start",
     borderLeftWidth: 3,
-    borderRightWidth: 3
+    borderRightWidth: 3,
   },
   badgeText: {
     fontSize: 12,
@@ -266,5 +296,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 4,
     textAlign: "center",
-  }
-})
+  },
+});

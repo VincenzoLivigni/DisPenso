@@ -131,9 +131,8 @@ export default function Dispense() {
 
               return (
                 <Accordions
-                  nomeDispensa={item.name}
                   products={pantryProds}
-                  pantryId={item.id}
+                  pantry={item}
                   search={searchPantry}
                 />
               );
