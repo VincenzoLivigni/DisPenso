@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Filters from "../../components/FIlters";
 
 import { usePantry } from "../../contexts/pantryContext";
+import PantryFormsSection from "../../components/PantryForms";
 
 export type SortOption =
   | "none"
@@ -23,10 +24,7 @@ export type SortOption =
 // export type QtySortOption = "none" | "qty-asc" | "qty-desc";
 
 export default function Dispense() {
-  const { pantries, products, createPantry, handleJoinPantry } = usePantry();
-
-  const [newPantry, setNewPantry] = useState("");
-  const [joinCode, setJoinCode] = useState("");
+  const { pantries, products } = usePantry();
 
   const [searchPantry, setSearchPantry] = useState("");
 
@@ -34,21 +32,6 @@ export default function Dispense() {
   // const [nameSort, setNameSort] = useState<NameSortOption>("none");
   // const [qtySort, setQtySort] = useState<QtySortOption>("none");
 
-  // crea nuova dispensa
-  const handleCreatePantry = async () => {
-    if (newPantry.trim().length < 3) {
-      return Alert.alert("Nome dipensa non valido");
-    }
-    await createPantry(newPantry.trim());
-    setNewPantry("");
-  };
-
-  // aggiungi membro a dispensa
-  const onJoinSubmit = async () => {
-    if (!joinCode) return
-    await handleJoinPantry(joinCode)
-    setJoinCode("")
-  }
 
   const cleanSearch = searchPantry.toLowerCase().trim();
 
@@ -101,35 +84,8 @@ export default function Dispense() {
 
   return (
     <View style={styles.mainContainer}>
-      {/* crea nuova dispensa */}
-      <Text style={{ marginStart: 13, marginTop: 10 }}>Aggiungi una nuova dispensa</Text>
-      <View style={styles.createdContainer}>
-        <TextInput
-          placeholder="Inserisci il nome della dispensa"
-          value={newPantry}
-          onChangeText={setNewPantry}
-          style={styles.input}
-        />
 
-        <Pressable style={styles.button} onPress={handleCreatePantry}>
-          <Text style={styles.textButton}>Aggiungi</Text>
-        </Pressable>
-      </View>
-
-      {/* entra in una dispensa */}
-      <Text style={{ marginStart: 13, marginTop: 10 }}>Entra in una dispensa già esistente</Text>
-      <View style={styles.createdContainer}>
-        <TextInput
-          placeholder="inserisci codice d'invito"
-          value={joinCode}
-          onChangeText={setJoinCode}
-          style={styles.input}
-        />
-
-        <Pressable style={styles.button} onPress={onJoinSubmit}>
-          <Text style={styles.textButton}>Unisciti</Text>
-        </Pressable>
-      </View>
+      <PantryFormsSection />
 
       {/* SEARCH BAR PER FILTRARE */}
       <Filters
@@ -171,36 +127,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "#ccc",
-  },
-  createdContainer: {
-    marginHorizontal: 13,
-    marginVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: "white",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: "#6e6e6e",
-    borderRadius: 10,
-  },
-  button: {
-    backgroundColor: "#3baecb",
-    borderWidth: 1,
-    borderColor: "#6e6e6e",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  textButton: {
-    color: "white",
-    fontWeight: "600",
   },
   pantriesContainer: {
     flex: 1,
