@@ -198,12 +198,15 @@ export async function pantryProducts(pantryId: number) {
     return data
 }
 
-// LISTA DISPENSE ✅
 export async function allPantries() {
+    const authHeaders = await auth();
 
     const res = await fetch(`${API}/pantry/pantries`, {
         method: "GET",
-        headers: await auth()
+        headers: {
+            ...authHeaders,
+            "Content-Type": "application/json"
+        }
     })
 
     const data = await res.json()
@@ -215,15 +218,21 @@ export async function allPantries() {
 
 // TUTTE LE SCADENZE ✅
 export async function allExpiringProducts() {
+    const authHeaders = await auth();
 
     const res = await fetch(`${API}/pantry-items/products/expiring`, {
         method: "GET",
-        headers: await auth()
+        headers: {
+            ...authHeaders,
+            "Content-Type": "application/json"
+        }
     })
 
     const data = await res.json()
 
-    if (!res.ok) throw new Error(data.message || "Errore nel recuperare i prodotti in scadenza")
+    if (!res.ok) {
+        throw new Error(data.message || "Errore nel recuperare i prodotti in scadenza");
+    }
 
     return data
 }

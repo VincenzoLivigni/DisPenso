@@ -18,5 +18,5 @@ app.use("/api/pantry", pantryRoutes);
 app.use("/api/pantry-items", pantryItemsRoutes);
 
 app.listen(3000, '0.0.0.0', () => {
-    console.log(`Server attivo su http://localhost:3000`);
+    console.log(`Server attivo su http://0.0.0.0:3000`);
 });
