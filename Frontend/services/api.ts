@@ -181,7 +181,26 @@ export async function deletePantry(
 ############################
 */
 
-// AGGIUNGI PRODOTTO ALLA DISPENSA ❌
+// AGGIUNGI PRODOTTO ALLA DISPENSA ✅
+export async function addProductToPantry(pantryId: number, barcode: string, quantity: number, expiration_date: string) {
+
+    const authHeaders = await auth()
+
+    const res = await fetch(`${API}/pantry-items/pantries/${pantryId}/items`, {
+        method: "POST",
+        headers: {
+            ...authHeaders,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ barcode, quantity, expiration_date })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore nell'aggiunta del nuovo prodotto")
+
+    return data
+}
 
 // PRODOTTI DISPENSA SPECIFICA ✅
 export async function pantryProducts(pantryId: number) {
