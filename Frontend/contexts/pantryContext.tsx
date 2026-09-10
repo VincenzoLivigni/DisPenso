@@ -9,7 +9,8 @@ import {
   joinPantry,
   acceptMember,
   deleteMember,
-  deletePantry
+  deletePantry,
+  allExpiringProducts,
 } from "../services/api";
 
 import React, {
@@ -19,6 +20,18 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+
+export type Product = {
+  id: string | number;
+  name: string;
+  image_url: string | null;
+  quantity: number;
+  expiration_date: string;
+  pantry: {
+    id: string | number;
+    name: string;
+  };
+};
 
 //info dispensa singola
 export type DataPantries = {
@@ -69,6 +82,8 @@ type PantryContextType = {
   pantryMembersDetails: { [pantryId: number]: DataPantryMembers[] };
   loading: boolean;
   loadPantries: () => Promise<void>;
+  loadExpiring: () => Promise<void>;
+  expiringProducts: Product[];
   createPantry: (name: string) => Promise<void>;
   handleUpdateProduct: (
     pantryId: number,
@@ -96,6 +111,30 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
   const [pantryMembersDetails, setPantryMembersDetails] = useState<{
     [pantryId: number]: DataPantryMembers[];
   }>({});
+
+  const [expiringProducts, setExpiringProducts] = useState<Product[]>([]);
+
+  //CHIMATA PER RECUPERARE I PRODOTTI IN SCADENZA
+  async function loadExpiring() {
+    try {
+      setLoading(true);
+      const data = await allExpiringProducts();
+
+      // prodotti nel carosello ordinati per scadenza
+      const sortedData = data.sort((a: Product, b: Product) => {
+        return (
+          new Date(a.expiration_date).getTime() -
+          new Date(b.expiration_date).getTime()
+        );
+      });
+
+      setExpiringProducts(sortedData);
+    } catch (err) {
+      console.log(err, "errore nel recupero delle scadenze");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   // RECUPERA TUTTE LE DISPENSE E TUTTI I PRODOTTI
   async function loadPantries() {
@@ -206,18 +245,17 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      await joinPantry(inviteCode.trim())
+      await joinPantry(inviteCode.trim());
       Alert.alert(
         "Richiesta Inviata",
-        "La tua richiesta è in attesa di approvazione da parte del proprietario."
+        "La tua richiesta è in attesa di approvazione da parte del proprietario.",
       );
       await loadPantries();
-    }
-    catch (err) {
+    } catch (err) {
       console.log("Errore", err);
       Alert.alert("Errore", "Impossibile unirsi alla dispensa");
     }
-  }
+  };
 
   //ACCETTA MEMBRO
   const handleAcceptMember = async (pantryId: number, memberId: number) => {
@@ -227,18 +265,15 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
       // aggiunta nuovo membro alla dispensa
       setPantryMembersDetails((prevDetails) => ({
         ...prevDetails,
-        [pantryId]: (prevDetails[pantryId] || []).map((member) => member.id === memberId
-          ? { ...member, status: "accepted" }
-          : member
+        [pantryId]: (prevDetails[pantryId] || []).map((member) =>
+          member.id === memberId ? { ...member, status: "accepted" } : member,
         ),
-      }))
-
+      }));
     } catch (err) {
       console.log("Errore", err);
       Alert.alert("Errore", "Impossibile accettare il membro nella dispensa");
     }
-  }
-
+  };
 
   //RIMUOVI MEMBRO DALLA DISPENSA
   const handleRemoveMember = async (pantryId: number, memberId: number) => {
@@ -248,15 +283,15 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
       // elimina membro dalla dispensa
       setPantryMembersDetails((prevDetails) => ({
         ...prevDetails,
-        [pantryId]: (prevDetails[pantryId] || []).filter((member) => member.id !== memberId
+        [pantryId]: (prevDetails[pantryId] || []).filter(
+          (member) => member.id !== memberId,
         ),
-      }))
-
+      }));
     } catch (err) {
       console.log("Errore", err);
       Alert.alert("Errore", "Impossibile rimuovere il membro dalla dispensa");
     }
-  }
+  };
 
   //ELIMINA DISPENSA
   const handleDeletePantry = async (pantryId: number) => {
@@ -264,31 +299,31 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
       await deletePantry(pantryId);
 
       // elimina la dispensa dalla lista
-      setPantries((prev) => prev.filter((p) => p.id !== pantryId))
+      setPantries((prev) => prev.filter((p) => p.id !== pantryId));
 
       // rimozione dei membri appartenenti alla dispensa
       setPantryMembersDetails((prev) => {
-        const updated = { ...prev }
-        delete updated[pantryId]
-        return updated
-      })
+        const updated = { ...prev };
+        delete updated[pantryId];
+        return updated;
+      });
 
       // rimozione dei prodotti dalla dispensa
       setProducts((prev) => {
-        const updated = { ...prev }
-        delete updated[pantryId]
-        return updated
-      })
-
+        const updated = { ...prev };
+        delete updated[pantryId];
+        return updated;
+      });
     } catch (err) {
       console.log("Errore", err);
       Alert.alert("Errore", "Impossibile eliminare la dispensa");
     }
-  }
+  };
 
   //CHIAMO TUTTE LE DISPENSE CON I PRODOTTI
   useEffect(() => {
     loadPantries();
+    loadExpiring();
   }, []);
 
   return (
@@ -306,7 +341,9 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
         handleJoinPantry,
         handleAcceptMember,
         handleRemoveMember,
-        handleDeletePantry
+        handleDeletePantry,
+        expiringProducts,
+        loadExpiring,
       }}
     >
       {children}
