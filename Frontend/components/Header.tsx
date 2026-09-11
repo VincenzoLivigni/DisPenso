@@ -4,6 +4,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useContext } from "react"
 import { AuthContext } from "../contexts/authContext"
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const logo = require("../assets/DisPenso_logo.png");
 
 export default function Header() {
     const router = useRouter();
@@ -16,33 +19,36 @@ export default function Header() {
     }
 
     return (
-        <View style={styles.headerContainer}>
-            <View style={styles.headerLeft}>
-                <Image
-                    source={require("../assets/DisPenso_logo.svg")}
-                    resizeMode="contain"
-                    style={styles.logo}>
-                </Image>
+        // per adattare l'header a schermi mobile
+        <SafeAreaView>
+            <View style={styles.headerContainer}>
+                <View style={styles.headerLeft}>
+                    <Image
+                        source={logo}
+                        resizeMode="contain"
+                        style={styles.logo}>
+                    </Image>
 
-                <Text style={styles.firstPartLogo}>is</Text>
-                <Text style={styles.secondPartLogo}>Penso</Text>
+                    <Text style={styles.firstPartLogo}>is</Text>
+                    <Text style={styles.secondPartLogo}>Penso</Text>
+                </View>
+
+                <View style={styles.headerRight}>
+                    <Pressable onPress={handleLogout}>
+                        <LinearGradient
+                            colors={["rgba(59, 175, 203, 1)", "rgba(71, 179, 161, 1)", "rgba(99, 190, 63, 1)"]}
+                            locations={[0, 0.5, 1]}
+                            start={{ x: 0.2, y: 1 }}
+                            end={{ x: 0.8, y: 0 }}
+                            style={styles.containerButtonLogout}
+                        >
+                            <SimpleLineIcons name="logout" size={24} color="white" style={{ marginRight: 7 }} />
+                        </LinearGradient>
+                    </Pressable>
+                </View>
+
             </View>
-
-            <View style={styles.headerRight}>
-                <Pressable onPress={handleLogout}>
-                    <LinearGradient
-                        colors={["rgba(59, 175, 203, 1)", "rgba(71, 179, 161, 1)", "rgba(99, 190, 63, 1)"]}
-                        locations={[0, 0.5, 1]}
-                        start={{ x: 0.2, y: 1 }}
-                        end={{ x: 0.8, y: 0 }}
-                        style={styles.containerButtonLogout}
-                    >
-                        <SimpleLineIcons name="logout" size={24} color="white" style={{ marginRight: 7 }} />
-                    </LinearGradient>
-                </Pressable>
-            </View>
-
-        </View>
+        </SafeAreaView>
     )
 }
 

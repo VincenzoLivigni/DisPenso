@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Header from "../../components/Header";
 
@@ -10,14 +11,18 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 
 export default function TabLayout() {
+  // per adattare il layout della tab in basso
+  const insets = useSafeAreaInsets()
+
   return (
+
     <Tabs
       screenOptions={{
         header: () => <Header />,
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#3BAFCB",
         tabBarInactiveTintColor: "#8E8E93",
-        tabBarStyle: styles.tabBarStyle
+        tabBarStyle: [styles.tabBarStyle, { height: 70 + insets.bottom, paddingBottom: insets.bottom }]
       }}
     >
       <Tabs.Screen
@@ -47,7 +52,7 @@ export default function TabLayout() {
                 end={{ x: 0.8, y: 0 }}
                 style={styles.barcode}
               >
-                <MaterialCommunityIcons name="barcode-scan" size={38} color="white" />
+                <MaterialCommunityIcons name="barcode-scan" size={30} color="white" />
               </LinearGradient>
             </View>
 
@@ -80,13 +85,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "black",
-    shadowOpacity: 0.075,
-    shadowRadius: 4,
-    shadowOffset: {
-      width: 0,
-      height: -2
-    }
   },
   barcode: {
     width: 70,
@@ -96,12 +94,5 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#3baecb",
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    shadowOffset: {
-      width: 0,
-      height: 4
-    }
   }
 })

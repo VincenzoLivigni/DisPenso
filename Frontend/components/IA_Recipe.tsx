@@ -60,7 +60,7 @@ export default function IA_Recipe() {
                                     />
 
                                     <View style={styles.recipeInfo}>
-                                        <Text style={styles.recipeTitle}>{item.title}</Text>
+                                        <Text style={styles.recipeTitle} numberOfLines={2}>{item.title}</Text>
 
                                         <Text style={styles.recipeDetails}>
                                             Usati: {item.usedIngredientCount} |
@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 600,
         color: "#3baecb",
+        height: 38
     },
     recipeDetails: {
         fontSize: 12,
