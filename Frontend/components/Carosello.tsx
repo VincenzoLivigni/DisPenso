@@ -18,63 +18,74 @@ export default function Carosello() {
   const { expiringProducts } = usePantry();
 
   return (
-    <View style={styles.carosello}>
-      <FlatList
-        horizontal
-        data={expiringProducts}
-        keyExtractor={(item) => item.id.toString()}
-        showsHorizontalScrollIndicator={true}
-        renderItem={({ item }) => {
-          const badge = expirationBadge(item.expiration_date);
+    <View style={styles.container}>
+      <Text style={styles.sectionTitle}>Prodotti in scadenza</Text>
 
-          return (
-            <View style={styles.card}>
-              <Pressable
-                style={styles.cardContent}
-                onPress={() => router.push("/Dispense")}
-              >
-                <Image
-                  source={
-                    item.image_url ? { uri: item.image_url } : placeholder
-                  }
-                  style={styles.image}
-                  resizeMode="cover"
-                />
+      <View>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={expiringProducts}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => {
+            const badge = expirationBadge(item.expiration_date);
 
-                <View style={styles.cardRight}>
-                  <Text numberOfLines={1} style={styles.title}>
-                    {item.name}
-                  </Text>
+            return (
+              <View style={styles.card}>
+                <Pressable
+                  style={styles.cardContent}
+                  onPress={() => router.push("/Dispense")}
+                >
+                  <Image
+                    source={
+                      item.image_url ? { uri: item.image_url } : placeholder
+                    }
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
 
-                  <Text style={styles.info}>{item.quantity} pz</Text>
-
-                  <View
-                    style={[
-                      styles.badge,
-                      {
-                        backgroundColor: badge.bg,
-                        borderLeftColor: badge.border,
-                        borderRightColor: badge.border,
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.badgeText, { color: badge.color }]}>
-                      {badge.text}
+                  <View style={styles.cardRight}>
+                    <Text numberOfLines={1} style={styles.title}>
+                      {item.name}
                     </Text>
+
+                    <Text style={styles.info}>{item.quantity} pz</Text>
+
+                    <View
+                      style={[
+                        styles.badge,
+                        {
+                          backgroundColor: badge.bg,
+                          borderLeftColor: badge.border,
+                          borderRightColor: badge.border,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.badgeText, { color: badge.color }]}>
+                        {badge.text}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            </View>
-          );
-        }}
-      />
+                </Pressable>
+              </View>
+            );
+          }}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  carosello: {
-    margin: 14,
+  container: {
+    marginHorizontal: 15,
+    marginVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: "black",
+    marginBottom: 10,
   },
   card: {
     width: 150,
