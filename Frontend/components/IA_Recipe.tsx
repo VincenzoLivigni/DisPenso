@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, FlatList, ScrollView } from "react-native";
 import { usePantry } from "../contexts/pantryContext";
 import { getRecipesByExpiringProducts, } from "../services/spoonacular";
-import { useState } from "react";
+import { translateText } from "../services/translate"
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import RecipeCard from "./RecipeCard";
 
 export default function IA_Recipe() {
     const [recipesList, setRecipesList] = useState<any[]>([]);
@@ -14,19 +17,77 @@ export default function IA_Recipe() {
         try {
             const recipes = await getRecipesByExpiringProducts(ingredientsArray); //cerco ricette con il nome degli ingredienti in scadenza
 
-            setRecipesList(recipes); //salvo le ricette dentro lo state
+            // traduzione dei titoli delle ricette in italiano
+            const translatedRecipesTitle = await Promise.all(
+                recipes.map(async (recipe: any) => {
+
+                    const translatedTitle = await translateText(recipe.title)
+                    return {
+                        ...recipe,
+                        title: translatedTitle
+                    }
+                })
+            )
+
+            setRecipesList(translatedRecipesTitle); //salvo le ricette dentro lo state
             setGeneratedRecipes(true)
         } catch (error) {
             console.log(error);
         }
     }
 
-    console.log(recipesList);
+    // preferiti
+    const [favorites, setFavorites] = useState<number[]>([])
+
+    // le ricette preferite vengono caricate all'avvio
+    useEffect(() => {
+        loadFavorites()
+    }, [])
+
+    // caricamento delle ricette preferite
+    async function loadFavorites() {
+        try {
+            const storedFavorites = await AsyncStorage.getItem("favorite_recipes")
+
+            if (storedFavorites) {
+                setFavorites(JSON.parse(storedFavorites))
+            }
+        }
+        catch (err) {
+            console.log("Errore nel caricamento delle ricette preferite:", err)
+        }
+    }
+
+    // toggle
+    async function toggleFavorites(recipe: any) {
+        try {
+            let updatedFavorites
+
+            if (favorites.includes(recipe.id)) {
+                // se la ricetta è già nei preferiti, viene rimossa
+                updatedFavorites = favorites.filter((id) => id !== recipe.id)
+            } else {
+                // se la ricetta non è nei preferiti, viene aggiunta
+                updatedFavorites = [...favorites, recipe.id]
+            }
+
+
+            setFavorites(updatedFavorites);
+            await AsyncStorage.setItem("favorite_recipes", JSON.stringify(updatedFavorites))
+        }
+        catch (err) {
+            console.log("Errore nel salvataggio della dispensa preferita: ", err)
+        }
+    }
+
+    // lista ricette preferite
+    const favoriteRecipes = recipesList.filter((r) => favorites.includes(r.id))
+
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             {/* titolo dinamico */}
             <Text style={styles.sectionTitle}>
-                {!generatedRecipes ? "Ricette contro lo spreco" : "Lasciati ispirare"}
+                {!generatedRecipes ? "Lasciati ispirare" : "Ricette contro lo spreco"}
             </Text>
 
             {
@@ -46,33 +107,55 @@ export default function IA_Recipe() {
                         // lista di ricette generata
                         <FlatList
                             data={recipesList}
+                            scrollEnabled={false}
                             showsVerticalScrollIndicator={false}
                             numColumns={2}
                             contentContainerStyle={styles.listContainer}
                             columnWrapperStyle={styles.rowContainer}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
-                                <Pressable style={styles.recipeCard}>
-                                    <Image
-                                        source={{ uri: item.image }}
-                                        style={styles.recipeImage}
-                                        resizeMode="contain"
-                                    />
 
-                                    <View style={styles.recipeInfo}>
-                                        <Text style={styles.recipeTitle} numberOfLines={2}>{item.title}</Text>
+                                // card ricette
+                                <RecipeCard
+                                    item={item}
+                                    isFavorite={favorites.includes(item.id)}
+                                    toggleFavorites={toggleFavorites}
+                                />
 
-                                        <Text style={styles.recipeDetails}>
-                                            Usati: {item.usedIngredientCount} |
-                                            Mancanti: {item.missedIngredientCount}
-                                        </Text>
-                                    </View>
-                                </Pressable>
                             )}
                         />
                     )
                 )}
-        </View>
+
+            {/* preferti */}
+            <View style={styles.sectionFavorites}>
+                <Text style={styles.sectionTitle}>Le tue ricette preferite</Text>
+
+                {favoriteRecipes.length === 0 ? (
+                    <Text style={styles.emptyText}>Non hai ancora salvato nessuna ricetta tra i preferiti</Text>
+                ) : (
+                    <FlatList
+                        data={favoriteRecipes}
+                        scrollEnabled={false}
+                        showsVerticalScrollIndicator={false}
+                        numColumns={2}
+                        contentContainerStyle={styles.listContainer}
+                        columnWrapperStyle={styles.rowContainer}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+
+                            // card ricette preferite
+                            <RecipeCard
+                                item={item}
+                                isFavorite={favorites.includes(item.id)}
+                                toggleFavorites={toggleFavorites}
+                            />
+                        )}
+                    />
+                )
+                }
+            </View>
+        </ScrollView>
     )
 }
 
@@ -118,29 +201,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginBottom: 15,
     },
-    recipeCard: {
-        width: "48%",
-        backgroundColor: "white",
-        borderRadius: 10,
-    },
-    recipeImage: {
-        width: "100%",
-        height: 118,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10
-    },
-    recipeInfo: {
-        padding: 8,
-    },
-    recipeTitle: {
-        fontSize: 14,
-        fontWeight: 600,
-        color: "#3baecb",
-        height: 38
-    },
-    recipeDetails: {
-        fontSize: 12,
-        color: "#6e6e6e",
-        marginTop: 8,
-    },
+    sectionFavorites: {
+        marginTop: 30,
+        paddingBottom: 130
+    }
 })
