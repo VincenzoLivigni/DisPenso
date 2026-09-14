@@ -3,7 +3,7 @@ import { usePantry } from "../contexts/pantryContext";
 import { getRecipesByExpiringProducts, } from "../services/spoonacular";
 import { translateText } from "../services/translate"
 import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getStorageItem, saveStorageItem } from "../services/storage"
 import RecipeCard from "./RecipeCard";
 
 export default function IA_Recipe() {
@@ -47,7 +47,7 @@ export default function IA_Recipe() {
     // caricamento delle ricette preferite
     async function loadFavorites() {
         try {
-            const storedFavorites = await AsyncStorage.getItem("favorite_recipes")
+            const storedFavorites = await getStorageItem("favorite_recipes")
 
             if (storedFavorites) {
                 setFavorites(JSON.parse(storedFavorites))
@@ -73,7 +73,7 @@ export default function IA_Recipe() {
 
 
             setFavorites(updatedFavorites);
-            await AsyncStorage.setItem("favorite_recipes", JSON.stringify(updatedFavorites))
+            await saveStorageItem("favorite_recipes", JSON.stringify(updatedFavorites))
         }
         catch (err) {
             console.log("Errore nel salvataggio della dispensa preferita: ", err)
