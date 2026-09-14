@@ -10,23 +10,27 @@ import {
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { usePantry } from "../../contexts/pantryContext";
+import { useRouter } from "expo-router"
 import { useState } from "react";
 import { addProductToPantry } from "../../services/api";
 
 export default function Barcode() {
+  // per reindirizzare l'utente nella pagina Dispense dopo aver confermato l'aggiunta del prodotto
+  const router = useRouter();
+
   //stati per usare la camera con i relativi permessi
   const [scanned, setScanned] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
 
   //stati con i dettagli del prodotto
-  const [pantryId, setPantryId] = useState<number>(1);
+  const [pantryId, setPantryId] = useState<number>(25);
   const [barcodeScan, setBarcodeScan] = useState<string>("");
   const [quantity, setQuantity] = useState("1");
   const [expiring, setExpiring] = useState<string>(
     new Date().toISOString().split("T")[0],
   );
 
-  const { pantries } = usePantry();
+  const { pantries, loadPantries } = usePantry();
 
   if (!permission) return <View />;
   if (!permission.granted) {
@@ -55,9 +59,15 @@ export default function Barcode() {
         expiring,
       );
 
+      if (loadPantries) {
+        await loadPantries()
+      }
+
       Alert.alert("prodotto aggiunto con successo");
       setBarcodeScan("");
       setScanned(false);
+
+      router.replace("/Dispense")
     } catch (err) {
       console.log("Errore nell'aggiunta del prodotto:", err);
       Alert.alert("impossibile aggiungere il prodotto");
