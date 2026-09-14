@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import { useRouter } from "expo-router"
 
 type RecipePropsProps = {
     item: {
@@ -13,6 +14,8 @@ type RecipePropsProps = {
 };
 
 export default function RecipeCard({ item, isFavorite, toggleFavorites }: RecipePropsProps) {
+    const router = useRouter()
+
     return (
         <View style={styles.recipeCard}>
             <Image
@@ -30,7 +33,9 @@ export default function RecipeCard({ item, isFavorite, toggleFavorites }: Recipe
             </Pressable>
 
             <View style={styles.recipeInfo}>
-                <Text style={styles.recipeTitle} numberOfLines={2}>{item.title}</Text>
+                <Pressable onPress={() => router.push(`/recipe/${item.id}` as any)}>
+                    <Text style={styles.recipeTitle} numberOfLines={2}>{item.title}</Text>
+                </Pressable>
 
                 <Text style={styles.recipeDetails}>
                     Usati: {item.usedIngredientCount} |
