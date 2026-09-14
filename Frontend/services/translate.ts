@@ -6,7 +6,8 @@ export async function translateText(text: string): Promise<string> {
     // se il titolo della ricetta è vuoto
     if (!text) return ""
 
-    const cache = `translation_${text.trim().toLowerCase()}`
+    const storageKey = text.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "_")
+    const cache = `translation_${storageKey}`
 
     try {
         // controllo se la traduzione è già salvata nello storage

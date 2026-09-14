@@ -34,9 +34,13 @@ export default function RecipeDetailScreen() {
 
     if (!recipe) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.emptyText}>Errore nel caricamento dei dettagli della ricetta</Text>
-            </View>
+            <>
+                <Stack.Screen options={{ headerShown: false }} />
+
+                <View style={styles.loadingContainer}>
+                    <Text style={styles.emptyText}>Caricamento della ricetta in corso...</Text>
+                </View>
+            </>
         );
     }
 
@@ -127,6 +131,12 @@ export default function RecipeDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        padding: 20,
+        borderRadius: 10,
+        flex: 1,
+        backgroundColor: "#f9f9f9",
+    },
     container: {
         flex: 1,
         backgroundColor: "#f9f9f9",

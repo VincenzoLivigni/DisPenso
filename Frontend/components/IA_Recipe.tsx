@@ -37,7 +37,7 @@ export default function IA_Recipe() {
     }
 
     // preferiti
-    const [favorites, setFavorites] = useState<number[]>([])
+    const [favorites, setFavorites] = useState<any[]>([])
 
     // le ricette preferite vengono caricate all'avvio
     useEffect(() => {
@@ -63,12 +63,12 @@ export default function IA_Recipe() {
         try {
             let updatedFavorites
 
-            if (favorites.includes(recipe.id)) {
+            if (favorites.some((f) => f.id === recipe.id)) {
                 // se la ricetta è già nei preferiti, viene rimossa
-                updatedFavorites = favorites.filter((id) => id !== recipe.id)
+                updatedFavorites = favorites.filter((f) => f.id !== recipe.id)
             } else {
                 // se la ricetta non è nei preferiti, viene aggiunta
-                updatedFavorites = [...favorites, recipe.id]
+                updatedFavorites = [...favorites, recipe]
             }
 
 
@@ -81,7 +81,7 @@ export default function IA_Recipe() {
     }
 
     // lista ricette preferite
-    const favoriteRecipes = recipesList.filter((r) => favorites.includes(r.id))
+    const isFavorite = (id: number) => favorites.some((f) => f.id === id);
 
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -112,13 +112,13 @@ export default function IA_Recipe() {
                             numColumns={2}
                             contentContainerStyle={styles.listContainer}
                             columnWrapperStyle={styles.rowContainer}
-                            keyExtractor={(item) => item.id.toString()}
+                            keyExtractor={(item, index) => item?.id ? item.id.toString() : index.toString()}
                             renderItem={({ item }) => (
 
                                 // card ricette
                                 <RecipeCard
                                     item={item}
-                                    isFavorite={favorites.includes(item.id)}
+                                    isFavorite={isFavorite(item.id)}
                                     toggleFavorites={toggleFavorites}
                                 />
 
@@ -131,23 +131,25 @@ export default function IA_Recipe() {
             <View style={styles.sectionFavorites}>
                 <Text style={styles.sectionTitle}>Le tue ricette preferite</Text>
 
-                {favoriteRecipes.length === 0 ? (
-                    <Text style={styles.emptyText}>Non hai ancora salvato nessuna ricetta tra i preferiti</Text>
+                {favorites.length === 0 ? (
+                    <View style={styles.loadingContainer}>
+                        <Text style={styles.emptyText}>Non hai ancora salvato nessuna ricetta tra i preferiti</Text>
+                    </View>
                 ) : (
                     <FlatList
-                        data={favoriteRecipes}
+                        data={favorites}
                         scrollEnabled={false}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
                         contentContainerStyle={styles.listContainer}
                         columnWrapperStyle={styles.rowContainer}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item, index) => item?.id ? item.id.toString() : index.toString()}
                         renderItem={({ item }) => (
 
                             // card ricette preferite
                             <RecipeCard
                                 item={item}
-                                isFavorite={favorites.includes(item.id)}
+                                isFavorite={isFavorite(item.id)}
                                 toggleFavorites={toggleFavorites}
                             />
                         )}
@@ -189,6 +191,12 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
+    },
+    loadingContainer: {
+        padding: 20,
+        borderRadius: 10,
+        flex: 1,
+        backgroundColor: "#f9f9f9",
     },
     emptyText: {
         fontSize: 14,
