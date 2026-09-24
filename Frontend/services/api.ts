@@ -299,3 +299,18 @@ export async function deleteProduct(
 
     return data
 }
+
+// SVUOTA TUTTE LE DISPENSE
+export async function clearPantries() {
+
+    const res = await fetch(`${API}/pantry-items/pantries/clearAllPantries`, {
+        method: "DELETE",
+        headers: await auth()
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.message || "Errore durante l'eliminazione dei prodotti")
+
+    return data
+}

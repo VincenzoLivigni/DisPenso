@@ -417,3 +417,29 @@ exports.deletePantryItem = async (req, res) => {
         return res.status(500).json({ message: "Errore durante l'eliminzione dell'articolo" })
     }
 }
+
+// ELIMINA TUTTI I PRODOTTI DI TUTTE LE MIE DISPENSE (solo quelle accettate)
+exports.deleteAllPantriesItems = async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const [result] = await db.query(
+            `DELETE FROM pantry_items 
+             WHERE pantry_id IN(
+                SELECT pantry_id
+                 FROM pantry_users
+                 WHERE user_id = ? AND status = 'accepted'
+            )`,
+            [userId]
+        )
+
+        return res.status(200).json({
+            message: "Dispense svuotate con successo",
+            deletedItemsCount: result.affectedRows
+        })
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ message: "Errore durante l'eliminazione dei prodotti dalle dispense" })
+    }
+}

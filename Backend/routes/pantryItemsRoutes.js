@@ -18,5 +18,7 @@ router.patch("/pantries/:pantryId/items/:itemId/consume", authMiddleware, pantry
 router.patch("/pantries/:pantryId/items/:itemId", authMiddleware, pantryItemsController.updateItem);
 //delete
 router.delete("/pantries/:pantryId/items/:itemId", authMiddleware, pantryItemsController.deletePantryItem)
+//delete all products
+router.delete("/pantries/clearAllPantries", authMiddleware, pantryItemsController.deleteAllPantriesItems)
 
 module.exports = router
