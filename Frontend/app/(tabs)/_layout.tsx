@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { View, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { TokenProvider } from "../../contexts/tokenContext";
 
 import Header from "../../components/Header";
 
@@ -12,70 +13,92 @@ import Entypo from "@expo/vector-icons/Entypo";
 
 export default function TabLayout() {
   // per adattare il layout della tab in basso
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   return (
-
-    <Tabs
-      screenOptions={{
-        header: () => <Header />,
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: "#3BAFCB",
-        tabBarInactiveTintColor: "#8E8E93",
-        tabBarStyle: [styles.tabBarStyle, { height: 70 + insets.bottom, paddingBottom: insets.bottom }]
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home-sharp" : "home-outline"} color={color} size={24} />
-          )
+    <TokenProvider>
+      <Tabs
+        screenOptions={{
+          header: () => <Header />,
+          tabBarShowLabel: false,
+          tabBarActiveTintColor: "#3BAFCB",
+          tabBarInactiveTintColor: "#8E8E93",
+          tabBarStyle: [
+            styles.tabBarStyle,
+            { height: 70 + insets.bottom, paddingBottom: insets.bottom },
+          ],
         }}
-      />
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "home-sharp" : "home-outline"}
+                color={color}
+                size={24}
+              />
+            ),
+          }}
+        />
 
-      <Tabs.Screen name="Dispense"
-        options={{
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="shelves" size={24} color={color} />
-          )
-        }} />
+        <Tabs.Screen
+          name="Dispense"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="shelves" size={24} color={color} />
+            ),
+          }}
+        />
 
-      <Tabs.Screen name="Barcode"
-        options={{
-          tabBarIcon: () => (
-            <View>
-              <LinearGradient
-                colors={["rgba(59, 175, 203, 1)", "rgba(71, 179, 161, 1)", "rgba(99, 190, 63, 1)"]}
-                locations={[0, 0.5, 1]}
-                start={{ x: 0.2, y: 1 }}
-                end={{ x: 0.8, y: 0 }}
-                style={styles.barcode}
-              >
-                <MaterialCommunityIcons name="barcode-scan" size={30} color="white" />
-              </LinearGradient>
-            </View>
+        <Tabs.Screen
+          name="Barcode"
+          options={{
+            tabBarIcon: () => (
+              <View>
+                <LinearGradient
+                  colors={[
+                    "rgba(59, 175, 203, 1)",
+                    "rgba(71, 179, 161, 1)",
+                    "rgba(99, 190, 63, 1)",
+                  ]}
+                  locations={[0, 0.5, 1]}
+                  start={{ x: 0.2, y: 1 }}
+                  end={{ x: 0.8, y: 0 }}
+                  style={styles.barcode}
+                >
+                  <MaterialCommunityIcons
+                    name="barcode-scan"
+                    size={30}
+                    color="white"
+                  />
+                </LinearGradient>
+              </View>
+            ),
+          }}
+        />
 
-          )
-        }} />
+        <Tabs.Screen
+          name="Ricette"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Entypo name="book" size={24} color={color} />
+            ),
+          }}
+        />
 
-      <Tabs.Screen name="Ricette"
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Entypo name="book" size={24} color={color} />
-          )
-        }} />
-
-      <Tabs.Screen name="Impostazioni"
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="settings-sharp" size={24} color={color} />
-          )
-        }} />
-    </Tabs >
+        <Tabs.Screen
+          name="Impostazioni"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="settings-sharp" size={24} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+    </TokenProvider>
   );
 }
-
 
 const styles = StyleSheet.create({
   tabBarStyle: {
@@ -94,5 +117,5 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: "center",
     alignItems: "center",
-  }
-})
+  },
+});
