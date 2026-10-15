@@ -4,13 +4,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { getRecipeInformation, RecipeDetails } from "../../services/spoonacular";
 import { translateRecipeDetails } from "../../services/translate";
+import { useToken } from "../../contexts/tokenContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
+const countedRecipeDetails = new Set<string>();
 
 export default function RecipeDetailScreen() {
     const router = useRouter()
 
     const { id } = useLocalSearchParams<{ id: string }>() // Prende l'[id] dalla rotta dinamica
     const [recipe, setRecipe] = useState<RecipeDetails | null>(null)
+    const { setCarToken } = useToken();
 
     useEffect(() => {
         if (id) {
@@ -24,7 +28,11 @@ export default function RecipeDetailScreen() {
 
             // traduzione della ricetta
             if (data) {
-                const translatedRecipe = await translateRecipeDetails(data);
+                const translatedRecipe = await translateRecipeDetails(data, false);
+                if (!countedRecipeDetails.has(String(id))) {
+                    setCarToken((current) => current + translatedRecipe.caratteritradotti);
+                    countedRecipeDetails.add(String(id));
+                }
                 setRecipe(translatedRecipe);
             }
         } catch (error) {

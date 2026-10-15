@@ -3,8 +3,9 @@ import "../global.css";
 import { Stack } from "expo-router";
 import { AuthProvider } from "../contexts/authContext";
 import { PantryProvider } from "../contexts/pantryContext";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { TokenProvider } from "../contexts/tokenContext";
 
 export default function RootLayout() {
   return (
@@ -13,20 +14,22 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AuthProvider>
           <PantryProvider>
-            <Stack>
-              {/* Gruppo Tabs (contiene la navbar in basso) */}
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <TokenProvider>
+              <Stack>
+                {/* Gruppo Tabs (contiene la navbar in basso) */}
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-              {/* Rotte autonome senza bottom tab */}
-              <Stack.Screen
-                name="Login"
-                options={{ title: "Accesso", headerShown: false }}
-              />
-              <Stack.Screen
-                name="Register"
-                options={{ title: "Registrazione", headerShown: false }}
-              />
-            </Stack>
+                {/* Rotte autonome senza bottom tab */}
+                <Stack.Screen
+                  name="Login"
+                  options={{ title: "Accesso", headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Register"
+                  options={{ title: "Registrazione", headerShown: false }}
+                />
+              </Stack>
+            </TokenProvider>
           </PantryProvider>
         </AuthProvider>
       </SafeAreaProvider>

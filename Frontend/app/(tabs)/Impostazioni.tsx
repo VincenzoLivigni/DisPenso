@@ -15,7 +15,7 @@ export default function Impostazioni() {
   const router = useRouter();
   const auth = useContext(AuthContext);
 
-  const { token } = useToken();
+  const { token, carToken } = useToken();
 
   // Gestione del Logout
   const handleLogout = async () => {
@@ -47,10 +47,14 @@ export default function Impostazioni() {
     }
   };
 
+  // costanti neessarie per le progressbar
   const tokenUsati = token;
-  console.log("questa è la constante che ci interessa:", tokenUsati);
   const tokenMax = 50;
-  const percetuale = (tokenUsati / tokenMax) * 100;
+  const percetuale = Math.round((tokenUsati / tokenMax) * 100);
+
+  const cartraduzione = carToken;
+  const carMax = 5000;
+  const traduzionePercentuale = Math.round((cartraduzione / carMax) * 100);
 
   return (
     <>
@@ -68,6 +72,14 @@ export default function Impostazioni() {
               Spoonacular: {tokenUsati} / {tokenMax}
             </Text>
             <ProgressBar value={percetuale} />
+          </View>
+
+          {/* progressbar traduzione */}
+          <View style={styles.apiBlock}>
+            <Text style={styles.apiLabel}>
+              Traduzioni: {cartraduzione} / {carMax}
+            </Text>
+            <ProgressBar value={traduzionePercentuale} />
           </View>
         </View>
 

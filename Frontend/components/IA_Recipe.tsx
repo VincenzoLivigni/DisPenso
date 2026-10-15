@@ -21,7 +21,7 @@ export default function IA_Recipe() {
   const { expiringProducts } = usePantry(); //prendo tutti gli ingredienti in scadenza
   const ingredientsArray = expiringProducts.map((p) => p.name); //tengo solo il nome degli ingredienti
 
-  const { token, setToken } = useToken();
+  const { token, setToken, setCarToken } = useToken();
 
   async function fetchRecipes() {
     try {
@@ -38,9 +38,15 @@ export default function IA_Recipe() {
       }
 
       // traduzione dei titoli delle ricette in italiano
+
+      let totalCharacters = 0;
+
       const translatedRecipesTitle = await Promise.all(
         recipes.data.map(async (recipe: any) => {
-          const translatedTitle = await translateText(recipe.title);
+          const translatedTitle = await translateText(recipe.title, (chars) => {
+            totalCharacters += chars;
+          });
+
           return {
             ...recipe,
             title: translatedTitle,
@@ -48,6 +54,7 @@ export default function IA_Recipe() {
         }),
       );
 
+      setCarToken((current) => current + totalCharacters);
       setRecipesList(translatedRecipesTitle); //salvo le ricette dentro lo state
       setGeneratedRecipes(true);
     } catch (error) {

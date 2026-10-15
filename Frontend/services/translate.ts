@@ -2,7 +2,7 @@ import { getStorageItem, saveStorageItem } from "./storage"
 import { RecipeDetails } from "./spoonacular"
 
 // traduzione del titolo della ricetta
-export async function translateText(text: string): Promise<string> {
+export async function translateText(text: string, translatedSuccess? : (characters : number) => void) {
     // se il titolo della ricetta è vuoto
     if (!text) return ""
 
@@ -13,6 +13,9 @@ export async function translateText(text: string): Promise<string> {
         // controllo se la traduzione è già salvata nello storage
         const cachedTranslation = await getStorageItem(cache)
         if (cachedTranslation) {
+            if (translatedSuccess) {
+                translatedSuccess(text.length)
+            }
             return cachedTranslation
         }
 
@@ -26,6 +29,10 @@ export async function translateText(text: string): Promise<string> {
 
             // salvataggio della traduzione nello storage per risparmiare chiamate API
             await saveStorageItem(cache, translatedText)
+
+            if (translatedSuccess) {
+             translatedSuccess(text.length)
+            }
 
             return translatedText
         }
@@ -42,12 +49,18 @@ export async function translateText(text: string): Promise<string> {
 }
 
 // traduzione dell'intera ricetta
-export async function translateRecipeDetails(recipe: RecipeDetails): Promise<RecipeDetails> {
+export async function translateRecipeDetails(recipe: RecipeDetails, countTitle = true): Promise<RecipeDetails & { caratteritradotti: number }> {
     // se non ho accesso alla ricetta
     if (!recipe) return recipe
 
+    // Variabile per accumulare il totale dei caratteri tradotti
+    let totalCharacters = 0
+    const handleSuccess = (characters: number) => {
+        totalCharacters += characters
+    }
+
     // traduzione del titolo
-    const translatedTitle = await translateText(recipe.title)
+    const translatedTitle = await translateText(recipe.title, countTitle ? handleSuccess : undefined)
 
     // traduzione degli ingredienti
     const translatedIngredients = await Promise.all(
@@ -58,8 +71,8 @@ export async function translateRecipeDetails(recipe: RecipeDetails): Promise<Rec
 
             return {
                 ...ing,
-                original: await translateText(cleanOriginalText),
-                name: ing.name ? await translateText(cleanName) : cleanName
+                original: await translateText(cleanOriginalText, handleSuccess),
+                name: ing.name ? await translateText(cleanName, handleSuccess) : cleanName
             }
         })
     )
@@ -71,7 +84,7 @@ export async function translateRecipeDetails(recipe: RecipeDetails): Promise<Rec
             ...block,
 
             // traduzione del nome del blocco
-            name: block.name ? await translateText(block.name) : block.name,
+            name: block.name ? await translateText(block.name, handleSuccess) : block.name,
             // map dei passaggi
             steps: await Promise.all(
                 block.steps.map(async (step) => {
@@ -79,7 +92,7 @@ export async function translateRecipeDetails(recipe: RecipeDetails): Promise<Rec
                     const cleanStepText = sanitizeStepText(step.step)
 
                     // traduzione passaggi
-                    const translatedStep = await translateText(cleanStepText)
+                    const translatedStep = await translateText(cleanStepText, handleSuccess)
 
                     return {
                         ...step,
@@ -95,7 +108,8 @@ export async function translateRecipeDetails(recipe: RecipeDetails): Promise<Rec
         ...recipe,
         title: translatedTitle,
         extendedIngredients: translatedIngredients,
-        analyzedInstructions: translatedInstructions
+        analyzedInstructions: translatedInstructions,
+        caratteritradotti: totalCharacters
     }
 }
 
