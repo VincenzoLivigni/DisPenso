@@ -2,7 +2,7 @@ import { getStorageItem, saveStorageItem } from "./storage"
 import { RecipeDetails } from "./spoonacular"
 
 // traduzione del titolo della ricetta
-export async function translateText(text: string, translatedSuccess? : (characters : number) => void) {
+export async function translateText(text: string, translatedSuccess?: (characters: number) => void) {
     // se il titolo della ricetta è vuoto
     if (!text) return ""
 
@@ -13,9 +13,6 @@ export async function translateText(text: string, translatedSuccess? : (characte
         // controllo se la traduzione è già salvata nello storage
         const cachedTranslation = await getStorageItem(cache)
         if (cachedTranslation) {
-            if (translatedSuccess) {
-                translatedSuccess(text.length)
-            }
             return cachedTranslation
         }
 
@@ -31,7 +28,7 @@ export async function translateText(text: string, translatedSuccess? : (characte
             await saveStorageItem(cache, translatedText)
 
             if (translatedSuccess) {
-             translatedSuccess(text.length)
+                translatedSuccess(text.length)
             }
 
             return translatedText

@@ -1,26 +1,27 @@
 import { Platform } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Helper di supporto universale per test web e mobile
+// Helper di supporto universale
 export async function saveStorageItem(key: string, value: string) {
     if (Platform.OS === 'web') {
-        localStorage.setItem(key, value)
+        localStorage.setItem(key, value);
     } else {
-        await SecureStore.setItemAsync(key, value)
+        // Usiamo AsyncStorage per evitare i limiti di dimensione di SecureStore
+        await AsyncStorage.setItem(key, value);
     }
 }
 
 export async function getStorageItem(key: string) {
     if (Platform.OS === 'web') {
-        return localStorage.getItem(key)
+        return localStorage.getItem(key);
     }
-    return await SecureStore.getItemAsync(key)
+    return await AsyncStorage.getItem(key);
 }
 
 export async function deleteStorageItem(key: string) {
     if (Platform.OS === 'web') {
-        localStorage.removeItem(key)
+        localStorage.removeItem(key);
     } else {
-        await SecureStore.deleteItemAsync(key)
+        await AsyncStorage.removeItem(key);
     }
 }

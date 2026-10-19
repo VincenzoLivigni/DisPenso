@@ -6,8 +6,7 @@ import { getRecipeInformation, RecipeDetails } from "../../services/spoonacular"
 import { translateRecipeDetails } from "../../services/translate";
 import { useToken } from "../../contexts/tokenContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
-const countedRecipeDetails = new Set<string>();
+import { getStorageItem, saveStorageItem } from "../../services/storage"
 
 export default function RecipeDetailScreen() {
     const router = useRouter()
@@ -23,16 +22,30 @@ export default function RecipeDetailScreen() {
     }, [id]);
 
     async function fetchDetails() {
-        try {
-            const data = await getRecipeInformation(Number(id))
+        if (!id) return;
 
-            // traduzione della ricetta
+        try {
+            const storageKey = `recipe_cache_${id}`;
+
+            // controllo se la ricetta è salvata nello storage locale
+            const cachedData = await getStorageItem(storageKey);
+
+            if (cachedData) {
+                // se esiste, i caratteri da tradurre non aumentano
+                setRecipe(JSON.parse(cachedData));
+                return;
+            }
+
+            const data = await getRecipeInformation(Number(id));
+
             if (data) {
                 const translatedRecipe = await translateRecipeDetails(data, false);
-                if (!countedRecipeDetails.has(String(id))) {
-                    setCarToken((current) => current + translatedRecipe.caratteritradotti);
-                    countedRecipeDetails.add(String(id));
-                }
+
+                setCarToken((current) => current + translatedRecipe.caratteritradotti);
+
+                // salvo ricetta tradotta nello storage
+                await saveStorageItem(storageKey, JSON.stringify(translatedRecipe));
+
                 setRecipe(translatedRecipe);
             }
         } catch (error) {
