@@ -126,7 +126,6 @@ export default function Dispense() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#ccc",
   },
   pantriesContainer: {
     flex: 1,

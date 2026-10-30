@@ -6,6 +6,7 @@ export const style = {
         greenLight: "#edf6ea",
         background: "#f7f8f5",
         surface: "#ffffff",
+        bgInput: "#f3f3f3",
         text: "#202923",
         textSecondary: "#666",
         border: "#dce3de",
@@ -36,7 +37,7 @@ export const style = {
         stats: 20
     },
     controls: {
-        buttonHeight: 48,
+        buttonHeight: 36,
         inputHeight: 48,
         minimumTouchTarget: 44,
     },
