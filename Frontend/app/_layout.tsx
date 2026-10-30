@@ -6,6 +6,7 @@ import { PantryProvider } from "../contexts/pantryContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TokenProvider } from "../contexts/tokenContext";
+import { FavoritesProvider } from "../contexts/favoritesContext";
 
 export default function RootLayout() {
   return (
@@ -14,22 +15,24 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AuthProvider>
           <PantryProvider>
-            <TokenProvider>
-              <Stack>
-                {/* Gruppo Tabs (contiene la navbar in basso) */}
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <FavoritesProvider>
+              <TokenProvider>
+                <Stack>
+                  {/* Gruppo Tabs (contiene la navbar in basso) */}
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-                {/* Rotte autonome senza bottom tab */}
-                <Stack.Screen
-                  name="Login"
-                  options={{ title: "Accesso", headerShown: false }}
-                />
-                <Stack.Screen
-                  name="Register"
-                  options={{ title: "Registrazione", headerShown: false }}
-                />
-              </Stack>
-            </TokenProvider>
+                  {/* Rotte autonome senza bottom tab */}
+                  <Stack.Screen
+                    name="Login"
+                    options={{ title: "Accesso", headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="Register"
+                    options={{ title: "Registrazione", headerShown: false }}
+                  />
+                </Stack>
+              </TokenProvider>
+            </FavoritesProvider>
           </PantryProvider>
         </AuthProvider>
       </SafeAreaProvider>

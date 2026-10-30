@@ -10,9 +10,10 @@ import { usePantry } from "../contexts/pantryContext";
 import { getRecipesByExpiringProducts } from "../services/spoonacular";
 import { translateText } from "../services/translate";
 import { useEffect, useState } from "react";
-import { getStorageItem, saveStorageItem } from "../services/storage";
+
 import RecipeCard from "./RecipeCard";
 import { useToken } from "../contexts/tokenContext";
+import { useFavorites } from "../contexts/favoritesContext";
 
 export default function IA_Recipe() {
   const [recipesList, setRecipesList] = useState<any[]>([]);
@@ -62,54 +63,10 @@ export default function IA_Recipe() {
     }
   }
 
-  // preferiti
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const { favorites, toggleFavorite } = useFavorites();
 
-  // le ricette preferite vengono caricate all'avvio
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  // caricamento delle ricette preferite
-  async function loadFavorites() {
-    try {
-      const storedFavorites = await getStorageItem("favorite_recipes");
-
-      if (storedFavorites) {
-        setFavorites(JSON.parse(storedFavorites));
-      }
-    } catch (err) {
-      console.log("Errore nel caricamento delle ricette preferite:", err);
-    }
-  }
-
-  // toggle
-  async function toggleFavorites(recipe: any) {
-    try {
-      let updatedFavorites;
-
-      if (favorites.some((f) => f.id === recipe.id)) {
-        // se la ricetta è già nei preferiti, viene rimossa
-        updatedFavorites = favorites.filter((f) => f.id !== recipe.id);
-      } else {
-        // se la ricetta non è nei preferiti, viene aggiunta
-        updatedFavorites = [...favorites, recipe];
-      }
-
-      setFavorites(updatedFavorites);
-      await saveStorageItem(
-        "favorite_recipes",
-        JSON.stringify(updatedFavorites),
-      );
-    } catch (err) {
-      console.log("Errore nel salvataggio della dispensa preferita: ", err);
-    }
-  }
-
-  // lista ricette preferite
-  const isFavorite = (id: number) => favorites.some((f) => f.id === id);
-
-  console.log(token);
+  const isFavorite = (id: number) =>
+    favorites.some((f) => f.id === id);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -123,34 +80,34 @@ export default function IA_Recipe() {
           <Text style={styles.buttonText}>Genera ricette con l'AI</Text>
         </Pressable>
       ) : // se la lista è vuota
-      recipesList.length === 0 ? (
-        <View style={styles.containerSectionIA}>
-          <Text style={styles.emptyText}>
-            Nessuna ricetta trovata con gli ingredienti in scadenza
-          </Text>
-        </View>
-      ) : (
-        // lista di ricette generata
-        <FlatList
-          data={recipesList}
-          scrollEnabled={false}
-          showsVerticalScrollIndicator={false}
-          numColumns={2}
-          contentContainerStyle={styles.listContainer}
-          columnWrapperStyle={styles.rowContainer}
-          keyExtractor={(item, index) =>
-            item?.id ? item.id.toString() : index.toString()
-          }
-          renderItem={({ item }) => (
-            // card ricette
-            <RecipeCard
-              item={item}
-              isFavorite={isFavorite(item.id)}
-              toggleFavorites={toggleFavorites}
-            />
-          )}
-        />
-      )}
+        recipesList.length === 0 ? (
+          <View style={styles.containerSectionIA}>
+            <Text style={styles.emptyText}>
+              Nessuna ricetta trovata con gli ingredienti in scadenza
+            </Text>
+          </View>
+        ) : (
+          // lista di ricette generata
+          <FlatList
+            data={recipesList}
+            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+            numColumns={2}
+            contentContainerStyle={styles.listContainer}
+            columnWrapperStyle={styles.rowContainer}
+            keyExtractor={(item, index) =>
+              item?.id ? item.id.toString() : index.toString()
+            }
+            renderItem={({ item }) => (
+              // card ricette
+              <RecipeCard
+                item={item}
+                isFavorite={isFavorite(item.id)}
+                toggleFavorites={toggleFavorite}
+              />
+            )}
+          />
+        )}
 
       {/* preferti */}
       <View style={styles.sectionFavorites}>
@@ -178,7 +135,7 @@ export default function IA_Recipe() {
               <RecipeCard
                 item={item}
                 isFavorite={isFavorite(item.id)}
-                toggleFavorites={toggleFavorites}
+                toggleFavorites={toggleFavorite}
               />
             )}
           />

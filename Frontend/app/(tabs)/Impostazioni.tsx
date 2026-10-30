@@ -8,14 +8,10 @@ import { AuthContext } from "../../contexts/authContext";
 
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useToken } from "../../contexts/tokenContext";
-import ProgressBar from "../../components/ProgressBar";
 
 export default function Impostazioni() {
   const router = useRouter();
   const auth = useContext(AuthContext);
-
-  const { token, carToken } = useToken();
 
   // Gestione del Logout
   const handleLogout = async () => {
@@ -47,14 +43,7 @@ export default function Impostazioni() {
     }
   };
 
-  // costanti neessarie per le progressbar
-  const tokenUsati = token;
-  const tokenMax = 50;
-  const percetuale = Math.round((tokenUsati / tokenMax) * 100);
 
-  const cartraduzione = carToken;
-  const carMax = 5000;
-  const traduzionePercentuale = Math.round((cartraduzione / carMax) * 100);
 
   return (
     <>
@@ -62,28 +51,6 @@ export default function Impostazioni() {
         <Pressable onPress={() => setOpenModalPantries(true)}>
           <Text>Svuota tutte le dispense</Text>
         </Pressable>
-
-        {/* progressbar */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Monitoraggio API</Text>
-
-          <View style={styles.apiBlock}>
-            <Text style={styles.apiLabel}>
-              Spoonacular: {tokenUsati} / {tokenMax}
-            </Text>
-            <ProgressBar value={percetuale} />
-          </View>
-
-          {/* progressbar traduzione */}
-          <View style={styles.apiBlock}>
-            <Text style={styles.apiLabel}>
-              Traduzioni: {cartraduzione} / {carMax}
-            </Text>
-            <ProgressBar value={traduzionePercentuale} />
-          </View>
-        </View>
-
-        {/* fine progressbar  */}
 
         {/* prodotti */}
         <Modal visible={openModalPantries} transparent={true}>
@@ -248,25 +215,8 @@ const styles = StyleSheet.create({
       height: 3,
     },
   },
-  section: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
-  },
   sectionTitle: {
     fontWeight: "600",
     marginBottom: 12,
-  },
-  apiBlock: {
-    marginBottom: 10,
-  },
-  apiLabel: {
-    color: "#666",
-    marginBottom: 4,
   },
 });
