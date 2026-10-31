@@ -11,6 +11,7 @@ import {
 import { style } from "../styles/generics";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 import { usePantry } from "../contexts/pantryContext"
 
@@ -67,70 +68,106 @@ export default function PantryForms() {
 
     return (
         <View style={styles.container}>
-            {isOpen && (
-                <View style={styles.formsWrapper}>
+            {/* Intestazione */}
+            <Pressable
+                style={styles.header}
+                onPress={toggleOpen}
+                accessibilityState={{ expanded: isOpen }}>
+
+                <View style={styles.headerLeft}>
+                    <FontAwesome5 name="users" size={20} color={style.colors.primary} />
+
                     <Text style={styles.title}>Gestione dispense</Text>
-
-                    <View style={styles.form}>
-                        {/* crea nuova dispensa */}
-                        <Text style={styles.label}>Aggiungi una nuova dispensa</Text>
-                        <View style={styles.inputRow}>
-                            <TextInput
-                                placeholder="Inserisci il nome della dispensa"
-                                value={newPantry}
-                                onChangeText={setNewPantry}
-                                style={styles.input}
-                            />
-
-                            <Pressable style={styles.button} onPress={handleCreatePantry}>
-                                <Text style={styles.textButton}>Aggiungi</Text>
-                            </Pressable>
-                        </View>
-                    </View>
-
-                    {/* entra in una dispensa */}
-                    <View style={styles.form}>
-                        <Text style={styles.label}>Entra in una dispensa già esistente</Text>
-                        <View style={styles.inputRow}>
-                            <TextInput
-                                placeholder="inserisci codice d'invito"
-                                value={joinCode}
-                                onChangeText={setJoinCode}
-                                style={styles.input}
-                            />
-
-                            <Pressable style={styles.button} onPress={onJoinSubmit}>
-                                <Text style={styles.textButton}>Unisciti</Text>
-                            </Pressable>
-                        </View>
-                    </View>
                 </View>
-            )
-            }
-            {/* bottone per aprire/chiudere la tendina */}
-            <Pressable style={styles.toggleButton} onPress={toggleOpen}>
+
                 <MaterialIcons
                     name={isOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"}
-                    size={24}
-                    color={style.colors.surface}
+                    size={26}
+                    color={style.colors.textSecondary}
+                    style={{ marginTop: 2 }}
                 />
             </Pressable>
+
+            {isOpen && (
+                <>
+                    <View style={styles.separator} />
+
+                    <View style={styles.formsWrapper}>
+
+                        <View style={styles.form}>
+                            {/* crea nuova dispensa */}
+                            <Text style={styles.label}>Aggiungi una nuova dispensa</Text>
+                            <View style={styles.inputRow}>
+                                <TextInput
+                                    placeholder="Inserisci il nome della dispensa"
+                                    value={newPantry}
+                                    onChangeText={setNewPantry}
+                                    style={styles.input}
+                                    placeholderTextColor={style.colors.textSecondary}
+                                />
+
+                                <Pressable style={styles.button} onPress={handleCreatePantry}>
+                                    <Text style={styles.textButton}>Aggiungi</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+
+                        {/* entra in una dispensa */}
+                        <View style={styles.form}>
+                            <Text style={styles.label}>Entra in una dispensa già esistente</Text>
+                            <View style={styles.inputRow}>
+                                <TextInput
+                                    placeholder="inserisci codice d'invito"
+                                    value={joinCode}
+                                    onChangeText={setJoinCode}
+                                    style={styles.input}
+                                    placeholderTextColor={style.colors.textSecondary}
+                                />
+
+                                <Pressable style={styles.button} onPress={onJoinSubmit}>
+                                    <Text style={styles.textButton}>Unisciti</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </>
+            )
+            }
+
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: style.colors.surface,
+        borderWidth: 1,
+        borderColor: style.colors.border,
+        borderRadius: style.radius.stats,
         marginHorizontal: style.spacing.md,
+        marginVertical: style.spacing.md,
+    },
+    header: {
+        height: 60,
+        paddingHorizontal: style.spacing.lg,
+        paddingVertical: style.spacing.md,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    headerLeft: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: style.spacing.sm,
+        flex: 1,
+    },
+    separator: {
+        height: 2,
+        borderTopColor: style.colors.bgInput,
+        marginHorizontal: style.spacing.md
     },
     formsWrapper: {
-        backgroundColor: style.colors.surface,
-        borderWidth: 2,
-        borderTopWidth: 0,
-        borderBottomLeftRadius: style.radius.stats,
-        borderBottomRightRadius: style.radius.stats,
-        borderColor: style.colors.primary,
-        paddingTop: 0,
+        paddingTop: style.spacing.xs,
         paddingBottom: style.spacing.lg,
         paddingHorizontal: style.spacing.md,
         gap: style.spacing.md,
@@ -138,9 +175,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: style.fontSize.lg,
         fontWeight: "600",
-        textAlign: "center",
         color: style.colors.text,
-        marginTop: style.spacing.md
     },
     form: {
         gap: style.spacing.sm,
@@ -157,6 +192,7 @@ const styles = StyleSheet.create({
         gap: style.spacing.sm,
     },
     input: {
+        height: style.controls.inputHeight,
         backgroundColor: style.colors.bgInput,
         color: style.colors.text,
         borderWidth: 1,
@@ -180,11 +216,5 @@ const styles = StyleSheet.create({
         color: style.colors.surface,
         fontWeight: "600"
     },
-    toggleButton: {
-        backgroundColor: style.colors.primary,
-        padding: style.spacing.sm,
-        borderBottomRightRadius: style.radius.modal,
-        borderBottomLeftRadius: style.radius.modal,
-        alignSelf: "center",
-    }
+
 })

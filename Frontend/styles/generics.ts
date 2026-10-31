@@ -3,13 +3,13 @@ export const style = {
         primary: "#3baecb",
         green: "#63be3f",
         cyanLight: "#e8f5f7",
-        greenLight: "#edf6ea",
+        greenLight: "#63be3f75",
         background: "#f7f8f5",
         surface: "#ffffff",
         bgInput: "#f3f3f3",
         text: "#202923",
         textSecondary: "#666",
-        border: "#dce3de",
+        border: "#b4bcb7",
         error: "#cb3b3b",
         warning: "#cbba3b",
     },
@@ -37,8 +37,9 @@ export const style = {
         stats: 20
     },
     controls: {
+        buttonHeightSmall: 30,
         buttonHeight: 36,
-        inputHeight: 48,
+        inputHeight: 36,
         minimumTouchTarget: 44,
     },
 } as const;
