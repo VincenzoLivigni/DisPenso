@@ -7,6 +7,7 @@ export const style = {
         background: "#f7f8f5",
         surface: "#ffffff",
         bgInput: "#f3f3f3",
+        bgDark: "#dddddd",
         text: "#202923",
         textSecondary: "#666",
         border: "#b4bcb7",

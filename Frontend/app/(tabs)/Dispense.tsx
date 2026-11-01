@@ -3,16 +3,18 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TextInput,
-  Pressable,
-  Alert,
 } from "react-native";
+
+import { useState } from "react";
+
 import Accordions from "../../components/Accordions";
-import { useEffect, useState } from "react";
 import Filters from "../../components/FIlters";
+import PantryFormsSection from "../../components/PantryForms";
 
 import { usePantry } from "../../contexts/pantryContext";
-import PantryFormsSection from "../../components/PantryForms";
+import { style } from "../../styles/generics";
+
+import Feather from '@expo/vector-icons/Feather';
 
 export type SortOption =
   | "none"
@@ -20,8 +22,6 @@ export type SortOption =
   | "name-desc"
   | "qty-asc"
   | "qty-desc";
-// export type NameSortOption = "none" | "name-asc" | "name-desc";
-// export type QtySortOption = "none" | "qty-asc" | "qty-desc";
 
 export default function Dispense() {
   const { pantries, products } = usePantry();
@@ -83,8 +83,7 @@ export default function Dispense() {
   const isSearchEmpty = cleanSearch !== "" && visiblePantries.length === 0;
 
   return (
-    <View style={styles.mainContainer}>
-
+    <>
       <PantryFormsSection />
 
       {/* SEARCH BAR PER FILTRARE */}
@@ -97,44 +96,82 @@ export default function Dispense() {
 
       {/* ACCORDION CHE VIENE STAMPATO */}
       <View style={styles.pantriesContainer}>
-        {isSearchEmpty ? (
-          <Text style={styles.notFoundText}>
-            Nessun prodotto trovato con questo nome
-          </Text>
-        ) : (
-          <FlatList
-            data={visiblePantries}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => {
-              const pantryProds = filteredProductsForPantry(item.id);
 
-              return (
-                <Accordions
-                  products={pantryProds}
-                  pantry={item}
-                  search={searchPantry}
-                />
-              );
-            }}
-          />
-        )}
+        <View style={styles.pantriesHeader}>
+          <View style={styles.pantriesHeaderLeft}>
+            <Feather name="box" size={22} color={style.colors.primary} style={{ marginTop: 2 }} />
+            <Text style={styles.pantriesTitle}>Le mie dispense</Text>
+          </View>
+        </View>
+
+        <View style={styles.pantriesContent}>
+          {isSearchEmpty ? (
+            <Text style={styles.notFoundText}>Nessun prodotto trovato con questo nome</Text>
+          ) : (
+            <FlatList
+              data={visiblePantries}
+              keyExtractor={(item) => item.id.toString()}
+              ItemSeparatorComponent={() => (
+                <View style={{ height: style.spacing.md }} />
+              )}
+              renderItem={({ item }) => {
+                const pantryProds = filteredProductsForPantry(item.id);
+
+                return (
+                  <Accordions
+                    products={pantryProds}
+                    pantry={item}
+                    search={searchPantry}
+                  />
+                );
+              }}
+            />
+          )}
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-  },
   pantriesContainer: {
-    flex: 1,
-    marginHorizontal: 13,
-    marginVertical: 15,
+    marginHorizontal: style.spacing.md,
+    marginVertical: style.spacing.md,
+  },
+  pantriesHeader: {
+    height: 60,
+    backgroundColor: style.colors.surface,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    borderTopLeftRadius: style.radius.stats,
+    borderTopRightRadius: style.radius.stats,
+    padding: style.spacing.md,
+    justifyContent: "center"
+  },
+  pantriesHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: style.spacing.sm,
+  },
+  pantriesTitle: {
+    fontSize: style.fontSize.lg,
+    fontWeight: "600",
+    color: style.colors.text,
+  },
+  pantriesContent: {
+    backgroundColor: style.colors.bgDark,
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: style.colors.border,
+    borderBottomLeftRadius: style.radius.stats,
+    borderBottomRightRadius: style.radius.stats,
+    padding: style.spacing.md,
+    flex: 1
   },
   notFoundText: {
+    fontSize: style.fontSize.sm,
     textAlign: "center",
-    marginTop: 20,
-    color: "#6e6e6e",
+    color: style.colors.textSecondary,
+    marginTop: style.spacing.lg,
   },
 });

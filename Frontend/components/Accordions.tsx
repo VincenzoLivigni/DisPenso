@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 import EditProductModal from "./EditProductModal";
 import DeleteProductModal from "./DeleteProductModal";
@@ -16,6 +16,8 @@ import {
 import { expirationBadge } from "../services/utils";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import PantryMembersModal from "./PantryMembersModal";
+
+import { style } from "../styles/generics";
 
 const placeholder = require("../assets/placeholder.png");
 
@@ -120,17 +122,9 @@ export default function Accordions({
         <Text style={styles.titlePantry}>{pantry.name}</Text>
         <View style={styles.actions}>
           <Pressable onPress={() => setIsOpenManageMemberModals(true)}>
-            <FontAwesome name="user" size={18} color="black" />
+            <FontAwesome5 name="user-alt" size={16} color="black" />
           </Pressable>
-          {!autoOpen ? (
-            <MaterialIcons
-              name="keyboard-arrow-down"
-              size={20}
-              color="#6e6e6e"
-            />
-          ) : (
-            <MaterialIcons name="keyboard-arrow-up" size={20} color="#6e6e6e" />
-          )}
+          <MaterialIcons name={autoOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={20} color="#6e6e6e" />
         </View>
       </Pressable>
 
@@ -150,7 +144,7 @@ export default function Accordions({
                 leftThreshold={40}
                 rightThreshold={40}
               >
-                <View key={p.item_id} style={styles.card}>
+                <View style={styles.card}>
                   <Image
                     source={p.image_url ? { uri: p.image_url } : placeholder}
                     style={styles.image}
@@ -210,91 +204,99 @@ export default function Accordions({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
-    paddingVertical: 15,
-    paddingHorizontal: 8,
-    marginBottom: 10,
-    borderRadius: 10,
+    backgroundColor: style.colors.surface,
+    borderRadius: style.radius.modal,
     borderWidth: 1,
-    borderColor: "#6e6e6e",
+    borderColor: style.colors.border,
+    padding: style.spacing.md,
+  },
+  titlePantry: {
+    fontSize: style.fontSize.md,
+    fontWeight: "600",
+    color: style.colors.text,
+    marginVertical: 2
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: style.spacing.sm,
   },
   toggle: {
-    paddingHorizontal: 10,
+    paddingHorizontal: style.spacing.md,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  titlePantry: {
-    fontWeight: "600",
-  },
   accordionContainer: {
-    gap: 8,
-    marginTop: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderTopWidth: 2,
-    borderTopColor: "#ccc",
+    borderTopWidth: 1,
+    borderTopColor: style.colors.border,
+    marginTop: style.spacing.md,
+    paddingTop: style.spacing.md,
+    gap: style.spacing.md,
   },
   card: {
-    backgroundColor: "white",
-    padding: 8,
+    minHeight: 80,
+    backgroundColor: style.colors.surface,
     borderWidth: 1,
-    borderColor: "#6e6e6e",
+    borderColor: style.colors.border,
+    borderRadius: style.radius.card,
+    padding: style.spacing.sm,
     flexDirection: "row",
     alignItems: "center",
   },
   image: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
+    width: 65,
+    height: 65,
+    borderRadius: style.radius.card,
   },
   infoContainer: {
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal: style.spacing.xs,
+    gap: style.spacing.xs,
   },
   productName: {
+    fontSize: style.fontSize.sm,
     fontWeight: "600",
+    color: style.colors.text,
   },
-  info: {},
-  actions: {
-    flexDirection: "row",
-    gap: 8,
+  info: {
+    fontSize: style.fontSize.sm,
+    fontWeight: "600",
+    color: style.colors.textSecondary,
   },
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    paddingHorizontal: style.spacing.sm,
+    paddingVertical: 2,
+    borderRadius: style.radius.control,
     alignSelf: "flex-start",
     borderLeftWidth: 3,
     borderRightWidth: 3,
   },
   badgeText: {
-    fontSize: 12,
+    fontSize: style.fontSize.xs,
     fontWeight: "700",
   },
   editAction: {
-    backgroundColor: "#3baecb",
+    width: 60,
+    backgroundColor: style.colors.primary,
+    borderTopLeftRadius: style.radius.card,
+    borderBottomLeftRadius: style.radius.card,
     justifyContent: "center",
     alignItems: "center",
-    width: 60,
-    height: 80.5,
-    borderTopStartRadius: 8,
-    borderBottomStartRadius: 8,
   },
   deleteAction: {
-    backgroundColor: "#ef4444",
+    width: 60,
+    backgroundColor: style.colors.error,
+    borderTopRightRadius: style.radius.card,
+    borderBottomRightRadius: style.radius.card,
     justifyContent: "center",
     alignItems: "center",
-    width: 60,
-    height: 80.5,
-    borderTopEndRadius: 8,
-    borderBottomEndRadius: 8,
   },
   actionText: {
-    color: "white",
-    fontSize: 11,
+    fontSize: style.fontSize.xs,
     fontWeight: "600",
-    marginTop: 4,
     textAlign: "center",
+    color: style.colors.surface,
+    marginTop: style.spacing.xs,
   },
 });

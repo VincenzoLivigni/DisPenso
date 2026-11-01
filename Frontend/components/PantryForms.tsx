@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     separator: {
-        height: 2,
-        borderTopColor: style.colors.bgInput,
+        borderBottomWidth: 2,
+        borderBottomColor: style.colors.bgInput,
         marginHorizontal: style.spacing.md
     },
     formsWrapper: {
