@@ -222,7 +222,6 @@ const styles = StyleSheet.create({
     gap: style.spacing.sm,
   },
   toggle: {
-    paddingHorizontal: style.spacing.md,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

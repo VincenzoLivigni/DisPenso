@@ -1,6 +1,8 @@
 import { View, Text, Pressable, StyleSheet, TextInput, Modal } from 'react-native';
 import { useEffect, useState } from 'react';
 
+import { style } from "../styles/generics";
+
 type dataProduct = {
     "item_id": number,
     "quantity": number,
@@ -24,7 +26,7 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
             setNewQuantity(product.quantity.toString())
 
             const formattedDate = product.expiration_date ? product.expiration_date.split('T')[0] : ""
-            
+
             setNewExpiration(formattedDate)
         }
     }, [product])
@@ -39,13 +41,18 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
 
     return (
         <>
-            <Modal visible={isOpenEditModal} transparent={true}>
+            <Modal visible={isOpenEditModal} transparent={true} animationType="fade" onRequestClose={onClose}>
                 <View style={styles.editModal}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.title}>Modifica
+
+                        {/* nome prodotto */}
+                        <Text style={styles.title}>Modifica{" "}
                             <Text style={styles.productName}>{product.name}</Text>
                         </Text>
 
+                        <View style={styles.modalSeparatorTop}></View>
+
+                        {/* quantità */}
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>Modifica quantità</Text>
                             <TextInput
@@ -54,9 +61,11 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
                                 value={newQuantity}
                                 onChangeText={setNewQuantity}
                                 style={styles.input}
+                                placeholderTextColor={style.colors.textSecondary}
                             />
                         </View>
 
+                        {/* scadenza */}
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>Modifica data di scadenza</Text>
                             <TextInput
@@ -64,9 +73,13 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
                                 value={newExpiration}
                                 onChangeText={setNewExpiration}
                                 style={styles.input}
+                                placeholderTextColor={style.colors.textSecondary}
                             />
                         </View>
 
+                        <View style={styles.modalSeparatorBottom}></View>
+
+                        {/* azioni */}
                         <View style={styles.actionsContainer}>
                             <Pressable onPress={handleSaveModal} style={styles.saveButton}>
                                 <Text style={styles.textButton}>Salva</Text>
@@ -86,68 +99,79 @@ export default function EditProductModal({ isOpenEditModal, product, onSave, onC
 const styles = StyleSheet.create({
     editModal: {
         backgroundColor: "rgba(0,0,0,0.5)",
-        padding: 25,
-        flex: 1,
+        padding: style.spacing.lg,
         justifyContent: "center",
+        flex: 1,
     },
     modalContent: {
-        backgroundColor: "white",
-        padding: 15,
-        borderRadius: 10
+        backgroundColor: style.colors.surface,
+        padding: style.spacing.lg,
+        borderRadius: style.radius.stats,
+        borderWidth: 1,
+        borderColor: style.colors.border,
+        gap: style.spacing.lg
     },
     title: {
-        fontSize: 20,
-        fontWeight: 600,
+        fontSize: style.fontSize.xl,
+        fontWeight: "600",
         textAlign: "center",
-        marginBottom: 25,
+        color: style.colors.text,
     },
     productName: {
-        color: "#3bafcb",
-        marginLeft: 5
+        color: style.colors.primary,
+    },
+    modalSeparatorTop: {
+        borderWidth: 1,
+        borderColor: style.colors.bgInput,
+    },
+    modalSeparatorBottom: {
+        borderWidth: 1,
+        borderColor: style.colors.bgInput,
+        marginVertical: style.spacing.xs,
     },
     inputContainer: {
-        marginBottom: 25,
+        gap: 6,
     },
     label: {
-        fontSize: 14,
+        fontSize: style.fontSize.md,
         fontWeight: '600',
-        color: '#2a2a2a',
-        marginBottom: 8,
+        color: style.colors.text
     },
     input: {
-        height: 40,
-        backgroundColor: '#f3f3f3',
-        borderRadius: 10,
-        paddingHorizontal: 16,
-        fontSize: 15,
-        color: 'black',
+        height: style.controls.inputHeight,
+        fontSize: style.fontSize.md,
+        backgroundColor: style.colors.bgInput,
+        color: style.colors.text,
         borderWidth: 1,
-        borderColor: 'transparent'
+        borderColor: style.colors.border,
+        borderRadius: style.radius.card,
+        paddingHorizontal: style.spacing.md,
     },
     actionsContainer: {
         flexDirection: "row",
-        gap: 15,
+        gap: style.spacing.sm,
     },
     saveButton: {
-        height: 40,
-        backgroundColor: "#63be3f",
-        borderRadius: 10,
-        flex: 1,
-        justifyContent: 'center',
+        height: style.controls.buttonHeight,
+        backgroundColor: style.colors.green,
+        borderRadius: style.radius.card,
+        justifyContent: "center",
         alignItems: 'center',
-        marginTop: 10
+        flex: 1,
     },
     nullButton: {
-        height: 40,
-        backgroundColor: "#959595",
-        borderRadius: 10,
-        flex: 1,
+        height: style.controls.buttonHeight,
+        backgroundColor: style.colors.border,
+        borderWidth: 1,
+        borderColor: style.colors.border,
+        borderRadius: style.radius.card,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10
+        flex: 1,
     },
     textButton: {
-        color: "white",
-        fontWeight: 600,
+        color: style.colors.surface,
+        fontSize: style.fontSize.sm,
+        fontWeight: "600"
     }
 });

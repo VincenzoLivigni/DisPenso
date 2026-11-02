@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+
+import { style } from "../styles/generics";
+
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
 import { DataPantries, usePantry } from "../contexts/pantryContext";
 
 type PantryMembersModalProps = {
@@ -37,52 +32,68 @@ export default function PantryMembersModal({
   }
 
   return (
-    <Modal visible={isOpenModal} transparent={true}>
+    <Modal visible={isOpenModal} transparent={true} animationType="fade" onRequestClose={onCloseModal}>
       <View style={styles.manageModal}>
         <View style={styles.modalContent}>
-          {/* nome + codice */}
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>
-              {name} - <Text style={styles.code}>{invite_code}</Text>
-            </Text>
+
+          {/* nome */}
+          <Text style={styles.title}>Gestione{" "}
+            <Text style={styles.pantryName}>{name}</Text>
+          </Text>
+
+          <View style={styles.modalSeparatorTop}></View>
+
+          {/* codice invito */}
+          <View style={styles.inviteCodeContainer}>
+            <Text style={styles.label}>Codice d'invito</Text>
+            <Text style={styles.code}>{invite_code}</Text>
           </View>
 
-          <ScrollView>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
             {/* richieste */}
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Richieste</Text>
-              {pendingMembers.map((m) => (
-                <View key={m.id} style={styles.sectionRow}>
-                  <Text style={styles.users}>{m.email}</Text>
-                  <View style={styles.actionButtons}>
-                    <Pressable onPress={() => handleAcceptMember(pantry.id, m.id)} style={styles.acceptBtn}>
-                      <MaterialIcons name="check" size={16} color="white" />
-                    </Pressable>
-                    <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={styles.rejectBtn}>
-                      <MaterialIcons name="close" size={16} color="white" />
-                    </Pressable>
+
+              {pendingMembers.length > 0 ? (
+                pendingMembers.map((m) => (
+                  <View key={m.id} style={styles.sectionRow}>
+                    <Text style={styles.users}>{m.email}</Text>
+
+                    <View style={styles.actionButtons}>
+                      <Pressable onPress={() => handleAcceptMember(pantry.id, m.id)} style={styles.acceptBtn}>
+                        <MaterialIcons name="check" size={16} color={style.colors.surface} />
+                      </Pressable>
+
+                      <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={styles.rejectBtn}>
+                        <MaterialIcons name="close" size={16} color={style.colors.surface} />
+                      </Pressable>
+                    </View>
+
                   </View>
-                </View>
-              ))}
+                ))
+              ) : (
+                <Text style={styles.emptyText}>
+                  Nessuna richiesta in attesa
+                </Text>
+              )}
             </View>
 
             {/* membri */}
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Membri</Text>
+
               {acceptedMembers.map((m) => (
                 <View key={m.id} style={styles.sectionRow}>
                   <Text style={styles.users}>{m.email}</Text>
-                  <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={{ marginLeft: 10 }}>
-                    <MaterialIcons
-                      name="delete-outline"
-                      size={20}
-                      color="#e74c3c"
-                    />
+                  <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={styles.trashButton}>
+                    <MaterialIcons name="delete-outline" size={16} color={style.colors.surface} />
                   </Pressable>
                 </View>
               ))}
             </View>
           </ScrollView>
+
+          <View style={styles.modalSeparatorBottom} />
 
           {/* azioni */}
           <View style={styles.footerButtons}>
@@ -93,6 +104,7 @@ export default function PantryMembersModal({
               <Text style={styles.textButton}>Annulla</Text>
             </Pressable>
           </View>
+
         </View>
       </View>
     </Modal>
@@ -102,94 +114,135 @@ export default function PantryMembersModal({
 const styles = StyleSheet.create({
   manageModal: {
     backgroundColor: "rgba(0,0,0,0.5)",
-    flex: 1,
+    padding: style.spacing.lg,
     justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
   },
   modalContent: {
-    width: "85%",
+    width: "100%",
+    maxWidth: 450,
     maxHeight: "80%",
-    backgroundColor: "white",
-    padding: 15,
-    borderRadius: 10,
-  },
-  titleRow: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    paddingBottom: 15,
-    marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: style.colors.surface,
+    padding: style.spacing.lg,
+    borderRadius: style.radius.stats,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    gap: style.spacing.lg
   },
   title: {
-    fontSize: 18,
-    fontWeight: 600,
+    fontSize: style.fontSize.xl,
+    fontWeight: "600",
     textAlign: "center",
+    color: style.colors.text,
+  },
+  pantryName: {
+    color: style.colors.primary,
+  },
+  modalSeparatorTop: {
+    borderWidth: 1,
+    borderColor: style.colors.bgInput,
+  },
+  modalSeparatorBottom: {
+    borderWidth: 1,
+    borderColor: style.colors.bgInput,
+    marginVertical: style.spacing.xs,
+  },
+  inviteCodeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: style.spacing.xs,
+  },
+  label: {
+    fontSize: style.fontSize.sm,
+    fontWeight: "600",
+    color: style.colors.text,
   },
   code: {
     fontWeight: "600",
-    color: "#bebebe",
+    color: style.colors.green,
+  },
+  scrollContent: {
+    gap: style.spacing.md,
   },
   sectionContainer: {
-    marginVertical: 10,
+    marginVertical: style.spacing.xs,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: style.fontSize.md,
     fontWeight: "600",
-    marginBottom: 8,
+    color: style.colors.text,
+    marginBottom: style.spacing.xs,
   },
   sectionRow: {
-    backgroundColor: "#f2f2f2",
-    marginBottom: 6,
-    padding: 10,
-    borderRadius: 8,
+    height: style.controls.inputHeight,
+    backgroundColor: style.colors.bgInput,
+    paddingHorizontal: style.spacing.md,
+    paddingVertical: style.spacing.sm,
+    borderRadius: style.radius.card,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: style.spacing.sm,
   },
   users: {
-    fontSize: 14,
+    fontSize: style.fontSize.sm,
+    color: style.colors.text,
     flex: 1,
+  },
+  emptyText: {
+    fontSize: style.fontSize.sm,
+    color: style.colors.textSecondary,
   },
   actionButtons: {
     flexDirection: "row",
-    gap: 6,
+    gap: style.spacing.sm,
   },
   acceptBtn: {
-    backgroundColor: "#2ecc71",
-    padding: 4,
-    borderRadius: 8,
+    backgroundColor: style.colors.green,
+    borderRadius: style.radius.control,
+    padding: style.spacing.xs,
+    justifyContent: "center",
+    alignItems: "center"
   },
   rejectBtn: {
-    backgroundColor: "#e74c3c",
-    padding: 4,
-    borderRadius: 8,
+    backgroundColor: style.colors.error,
+    borderRadius: style.radius.control,
+    padding: style.spacing.xs,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  trashButton: {
+    backgroundColor: style.colors.error,
+    borderRadius: style.radius.control,
+    padding: style.spacing.xs,
+    justifyContent: "center",
+    alignItems: "center",
   },
   footerButtons: {
-    marginTop: 10,
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
     flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
+    gap: style.spacing.sm,
   },
   deleteButton: {
-    flex: 1,
-    backgroundColor: "#e74c3c",
-    paddingVertical: 10,
-    borderRadius: 8,
+    height: style.controls.buttonHeight,
+    backgroundColor: style.colors.error,
+    borderRadius: style.radius.card,
+    justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
   nullButton: {
-    flex: 1,
-    backgroundColor: "#bebebe",
-    paddingVertical: 10,
-    borderRadius: 8,
+    height: style.controls.buttonHeight,
+    backgroundColor: style.colors.border,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    borderRadius: style.radius.card,
+    justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
   textButton: {
-    color: "white",
+    fontSize: style.fontSize.sm,
     fontWeight: "600",
+    color: style.colors.surface,
   },
 });
