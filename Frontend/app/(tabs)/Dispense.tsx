@@ -3,9 +3,11 @@ import {
   Text,
   StyleSheet,
   FlatList,
+  Pressable,
 } from "react-native";
 
 import { useState } from "react";
+import { useRouter } from "expo-router";
 
 import Accordions from "../../components/Accordions";
 import Filters from "../../components/FIlters";
@@ -82,6 +84,12 @@ export default function Dispense() {
   // Se stiamo cercando ma visiblePantries è vuoto, non c'è nulla da mostrare in assoluto
   const isSearchEmpty = cleanSearch !== "" && visiblePantries.length === 0;
 
+  const router = useRouter();
+  const handleOpenDetail = (pantryId: number) => {
+    router.push(`/pantry/${pantryId}`);
+  };
+
+
   return (
     <>
       <PantryFormsSection />
@@ -106,7 +114,7 @@ export default function Dispense() {
 
         <View style={styles.pantriesContent}>
           {isSearchEmpty ? (
-            <Text style={styles.notFoundText}>Nessun prodotto trovato con questo nome</Text>
+            <Text style={styles.notFoundText}>Nessuna dispensa trovata</Text>
           ) : (
             <FlatList
               data={visiblePantries}
@@ -114,17 +122,11 @@ export default function Dispense() {
               ItemSeparatorComponent={() => (
                 <View style={{ height: style.spacing.md }} />
               )}
-              renderItem={({ item }) => {
-                const pantryProds = filteredProductsForPantry(item.id);
-
-                return (
-                  <Accordions
-                    products={pantryProds}
-                    pantry={item}
-                    search={searchPantry}
-                  />
-                );
-              }}
+              renderItem={({ item }) => (
+                <Pressable style={styles.pantryCard} onPress={() => handleOpenDetail(item.id)}>
+                  <Text style={styles.pantriesTitle}>{item.name}</Text>
+                </Pressable>
+              )}
             />
           )}
         </View>
@@ -152,6 +154,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: style.spacing.sm,
+  },
+  pantryCard: {
+    backgroundColor: style.colors.surface,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    borderRadius: style.radius.card,
+    padding: style.spacing.md,
   },
   pantriesTitle: {
     fontSize: style.fontSize.lg,

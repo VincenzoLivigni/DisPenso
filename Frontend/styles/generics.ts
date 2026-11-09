@@ -2,17 +2,19 @@ export const style = {
     colors: {
         primary: "#3baecb",
         green: "#63be3f",
-        cyanLight: "#e8f5f7",
+        cyanLight: "#d3ebef",
         greenLight: "#63be3f75",
-        background: "#f7f8f5",
+        background: "#f1f3ee",
         surface: "#ffffff",
         bgInput: "#f3f3f3",
         bgDark: "#dddddd",
         text: "#202923",
         textSecondary: "#666",
-        border: "#b4bcb7",
+        border: "#dbdfdd",
         error: "#cb3b3b",
         warning: "#cbba3b",
+        separatorDark: "#dbdfdd",
+        shadow: "#000000"
     },
     fontSize: {
         xs: 12,
@@ -22,6 +24,13 @@ export const style = {
         xl: 20,
         xxl: 24,
         title: 28,
+    },
+    fontWeight: {
+        regular: "400",
+        medium: "500",
+        semibold: "600",
+        bold: "700",
+        bolder: "800"
     },
     spacing: {
         xs: 4,
@@ -35,7 +44,8 @@ export const style = {
         control: 8,
         card: 12,
         modal: 16,
-        stats: 20
+        stats: 20,
+        circle: 50
     },
     controls: {
         buttonHeightSmall: 30,
