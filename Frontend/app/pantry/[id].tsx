@@ -1,5 +1,5 @@
 // compnenti React Native
-import { View, Text, Pressable, StyleSheet, Modal, ScrollView } from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 
 // navigazione app
 import { useLocalSearchParams, Stack, useRouter } from "expo-router";
@@ -12,6 +12,7 @@ import ProductCard from "../../components/ProductCard";
 import EditProductModal from "../../components/EditProductModal";
 import DeleteProductModal from "../../components/DeleteProductModal";
 import PantryMembersModal from "../../components/PantryMembersModal";
+import ProductActionsModal from "../../components/ProductActionsModal";
 
 // stili
 import { style } from "../../styles/generics";
@@ -149,7 +150,7 @@ export default function DettaglioDispensa() {
 
                     <View style={styles.productsHeader}>
                         <Text style={styles.productsTitle}>
-                            <Feather name="box" size={20} color={style.colors.primary} />{" "}
+                            <Feather name="package" size={20} color={style.colors.primary} />{" "}
                             Prodotti presenti
                         </Text>
 
@@ -191,57 +192,30 @@ export default function DettaglioDispensa() {
             )}
 
             {/* modale azioni del prodotto */}
-            <Modal
+            <ProductActionsModal
                 visible={isOpenMenu}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setIsOpenMenu(false)}
-            >
-                <View style={styles.modalOverlay}>
+                product={selectedProductForMenu}
 
-                    <View style={styles.menuModal}>
-                        <View style={styles.menuHeader}>
-                            <Text style={styles.menuTitle}>Gestisci{" "}
-                                <Text style={styles.menuSubtitle}>{selectedProductForMenu?.name}</Text>
-                            </Text>
-                        </View>
+                onClose={() => setIsOpenMenu(false)}
 
-                        <Pressable
-                            style={styles.menuOption}
-                            onPress={() => {
-                                if (selectedProductForMenu) {
-                                    setSelectedProduct(selectedProductForMenu);
-                                    setIsOpenMenu(false);
-                                    setIsOpenEditModal(true);
-                                }
-                            }}>
-                            <Text style={styles.editText}>Modifica</Text>
-                        </Pressable>
+                onEdit={() => {
+                    if (!selectedProductForMenu) return;
 
-                        <Pressable
-                            style={[styles.menuOption, styles.deleteOption]}
-                            onPress={() => {
-                                if (selectedProductForMenu) {
-                                    setSelectedProductToDelete(selectedProductForMenu);
-                                    setIsOpenMenu(false);
-                                    setIsOpenDeleteModal(true);
-                                }
-                            }}>
-                            <Text style={styles.deleteText}>Elimina</Text>
-                        </Pressable>
+                    setSelectedProduct(selectedProductForMenu);
+                    setIsOpenMenu(false);
+                    setSelectedProductForMenu(null);
+                    setIsOpenEditModal(true);
+                }}
 
-                        <Pressable
-                            style={styles.cancelButton}
-                            onPress={() => {
-                                setIsOpenMenu(false);
-                                setSelectedProductForMenu(null);
-                            }}>
-                            <Text style={styles.cancelText}>Annulla</Text>
-                        </Pressable>
+                onDelete={() => {
+                    if (!selectedProductForMenu) return;
 
-                    </View>
-                </View>
-            </Modal>
+                    setSelectedProductToDelete(selectedProductForMenu);
+                    setIsOpenMenu(false);
+                    setSelectedProductForMenu(null);
+                    setIsOpenDeleteModal(true);
+                }}
+            />
 
             {/* modale modifica prodotto */}
             <EditProductModal
@@ -283,6 +257,12 @@ const styles = StyleSheet.create({
         borderRadius: style.radius.circle,
         alignItems: "center",
         justifyContent: "center",
+
+        shadowColor: style.colors.shadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2
     },
     pantryHeader: {
         padding: style.spacing.md,
@@ -330,71 +310,6 @@ const styles = StyleSheet.create({
         paddingVertical: style.spacing.xs,
         paddingHorizontal: style.spacing.md,
         borderRadius: style.radius.stats,
-    },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.25)",
-        justifyContent: "flex-end",
-    },
-    menuModal: {
-        width: "100%",
-        backgroundColor: style.colors.surface,
-        paddingHorizontal: style.spacing.lg,
-        paddingTop: style.spacing.xl,
-        paddingBottom: style.spacing.xxl,
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
-        borderWidth: 1,
-        borderColor: style.colors.border,
-        gap: style.spacing.sm,
-    },
-    menuHeader: {
-        alignItems: "center",
-        gap: style.spacing.xs,
-        marginBottom: style.spacing.lg,
-    },
-    menuTitle: {
-        fontSize: style.fontSize.lg,
-        fontWeight: style.fontWeight.bold,
-        color: style.colors.text,
-    },
-    menuSubtitle: {
-        color: style.colors.primary,
-    },
-    menuOption: {
-        height: 45,
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: style.radius.modal,
-        backgroundColor: style.colors.background
-    },
-    editText: {
-        color: style.colors.green,
-        fontSize: style.fontSize.md,
-        fontWeight: style.fontWeight.bold,
-        letterSpacing: 0.1
-    },
-    deleteOption: {
-        backgroundColor: style.colors.background
-    },
-    deleteText: {
-        color: style.colors.error,
-        fontSize: style.fontSize.md,
-        fontWeight: style.fontWeight.bold,
-        letterSpacing: 0.2
-    },
-    cancelButton: {
-        height: 45,
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: style.radius.modal,
-        backgroundColor: style.colors.background,
-    },
-    cancelText: {
-        color: style.colors.textSecondary,
-        fontSize: style.fontSize.md,
-        fontWeight: style.fontWeight.bold,
-        letterSpacing: 0.2
     },
     membersButton: {
         backgroundColor: style.colors.primary,

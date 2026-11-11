@@ -1,7 +1,13 @@
+// compnenti React Native
 import { View, Text, Pressable, StyleSheet, Modal } from 'react-native';
 
+// stili
 import { style } from "../styles/generics";
 
+// icone
+import Feather from '@expo/vector-icons/Feather';
+
+// tipi
 type dataProduct = {
     "item_id": number,
     "quantity": number,
@@ -26,19 +32,27 @@ export default function DeleteProductModal({ isOpenDeleteModal, product, onConfi
                 <View style={styles.deleteModal}>
                     <View style={styles.modalContent}>
 
-                        {/* conferna eliminazione */}
-                        <Text style={styles.title}>Vuoi eliminare{" "}
-                            <Text style={styles.productName}>{product.name}</Text>?
-                        </Text>
+                        <View style={styles.headerDeleteModal}>
+                            <View style={styles.circle}>
+                                <Feather name="trash-2" size={25} color={style.colors.error} />
+                            </View>
+
+                            {/* conferna eliminazione */}
+                            <Text style={styles.title}>Elimina Prodotto</Text>
+
+                            <Text style={styles.subtitle}>Sei sicuro di voler eliminare{" "}
+                                <Text style={styles.productName}>{product.name}</Text>?
+                            </Text>
+                        </View>
 
                         {/* azioni */}
                         <View style={styles.actionsContainer}>
-                            <Pressable onPress={onConfirm} style={styles.deleteButton}>
-                                <Text style={styles.textButton}>Elimina</Text>
-                            </Pressable>
-
                             <Pressable onPress={onClose} style={styles.nullButton}>
                                 <Text style={styles.textButton}>Annulla</Text>
+                            </Pressable>
+
+                            <Pressable onPress={onConfirm} style={styles.deleteButton}>
+                                <Text style={styles.textButton}>Elimina</Text>
                             </Pressable>
                         </View>
 
@@ -51,53 +65,74 @@ export default function DeleteProductModal({ isOpenDeleteModal, product, onConfi
 
 const styles = StyleSheet.create({
     deleteModal: {
-        backgroundColor: "rgba(0,0,0,0.5)",
+        backgroundColor: "rgba(0,0,0,0.25)",
         padding: style.spacing.lg,
         justifyContent: "center",
+        alignItems: "center",
         flex: 1,
     },
     modalContent: {
+        width: "100%",
         backgroundColor: style.colors.surface,
         padding: style.spacing.lg,
         borderRadius: style.radius.stats,
         borderWidth: 1,
         borderColor: style.colors.border,
-        gap: style.spacing.xxl
+        gap: style.spacing.md,
+    },
+    headerDeleteModal: {
+        alignItems: "center",
+        gap: style.spacing.xs,
+        marginBottom: style.spacing.lg,
+    },
+    circle: {
+        width: 50,
+        height: 50,
+        backgroundColor: style.colors.backgroundError,
+        borderRadius: style.radius.circle,
+        justifyContent: "center",
+        alignItems: "center",
     },
     title: {
         fontSize: style.fontSize.xl,
-        fontWeight: "600",
+        fontWeight: style.fontWeight.bold,
         textAlign: "center",
         color: style.colors.text,
     },
+    subtitle: {
+        fontSize: style.fontSize.md,
+        fontWeight: style.fontWeight.medium,
+        textAlign: "center",
+        color: style.colors.textSecondary,
+        paddingHorizontal: style.spacing.sm
+    },
     productName: {
-        color: style.colors.primary,
+        fontWeight: style.fontWeight.bold,
+        color: style.colors.error,
     },
     actionsContainer: {
         flexDirection: "row",
         gap: style.spacing.sm,
     },
     deleteButton: {
-        height: style.controls.buttonHeight,
+        minHeight: style.controls.minimumTouchTarget,
         backgroundColor: style.colors.error,
-        borderRadius: style.radius.card,
+        borderRadius: style.radius.modal,
         justifyContent: "center",
         alignItems: 'center',
         flex: 1,
     },
     nullButton: {
-        height: style.controls.buttonHeight,
-        backgroundColor: style.colors.border,
-        borderWidth: 1,
-        borderColor: style.colors.border,
-        borderRadius: style.radius.card,
+        minHeight: style.controls.minimumTouchTarget,
+        backgroundColor: style.colors.null,
+        borderRadius: style.radius.modal,
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,
     },
     textButton: {
         color: style.colors.surface,
-        fontSize: style.fontSize.sm,
-        fontWeight: "600"
+        fontSize: style.fontSize.md,
+        fontWeight: style.fontWeight.semibold,
     }
 });

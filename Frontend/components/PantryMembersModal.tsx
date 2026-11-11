@@ -1,9 +1,16 @@
+// compnenti React Native
 import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 
+// stili
 import { style } from "../styles/generics";
 
+// icone
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Feather from '@expo/vector-icons/Feather';
 
+// tipi
 import { DataPantries, usePantry } from "../contexts/pantryContext";
 
 type PantryMembersModalProps = {
@@ -36,20 +43,29 @@ export default function PantryMembersModal({
       <View style={styles.manageModal}>
         <View style={styles.modalContent}>
 
-          {/* nome */}
-          <Text style={styles.title}>Gestione{" "}
-            <Text style={styles.pantryName}>{name}</Text>
-          </Text>
+          <View style={styles.headerManageModal}>
+            <View style={styles.circle}>
+              <FontAwesome5 name="user-friends" size={25} color={style.colors.primary} />
+            </View>
 
-          <View style={styles.modalSeparatorTop}></View>
+            {/* nome */}
+            <Text style={styles.title}>Gestione dispensa</Text>
+
+            <Text style={styles.subtitle}>Visualizza e gestisci i membri della tua dispensa</Text>
+          </View>
 
           {/* codice invito */}
           <View style={styles.inviteCodeContainer}>
-            <Text style={styles.label}>Codice d'invito</Text>
+            <Text style={styles.label}>
+              <Ionicons name="ticket-outline" size={18} color={style.colors.primary} />{" "}
+              Codice d'invito
+            </Text>
             <Text style={styles.code}>{invite_code}</Text>
           </View>
 
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView
+            style={{ flexShrink: 1 }}
+            contentContainerStyle={styles.scrollContent}>
             {/* richieste */}
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Richieste</Text>
@@ -86,22 +102,21 @@ export default function PantryMembersModal({
                 <View key={m.id} style={styles.sectionRow}>
                   <Text style={styles.users}>{m.email}</Text>
                   <Pressable onPress={() => handleRemoveMember(pantry.id, m.id)} style={styles.trashButton}>
-                    <MaterialIcons name="delete-outline" size={16} color={style.colors.surface} />
+                    <Feather name="trash-2" size={15} color={style.colors.surface} />
                   </Pressable>
                 </View>
               ))}
             </View>
           </ScrollView>
 
-          <View style={styles.modalSeparatorBottom} />
-
           {/* azioni */}
           <View style={styles.footerButtons}>
-            <Pressable onPress={() => deletePantry(pantry.id)} style={styles.deleteButton}>
-              <Text style={styles.textButton}>Elimina Dispensa</Text>
-            </Pressable>
             <Pressable onPress={onCloseModal} style={styles.nullButton}>
               <Text style={styles.textButton}>Annulla</Text>
+            </Pressable>
+
+            <Pressable onPress={() => deletePantry(pantry.id)} style={styles.deleteButton}>
+              <Text style={styles.textButton}>Elimina Dispensa</Text>
             </Pressable>
           </View>
 
@@ -113,9 +128,10 @@ export default function PantryMembersModal({
 
 const styles = StyleSheet.create({
   manageModal: {
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.25)",
     padding: style.spacing.lg,
     justifyContent: "center",
+    alignItems: "center",
     flex: 1,
   },
   modalContent: {
@@ -127,39 +143,50 @@ const styles = StyleSheet.create({
     borderRadius: style.radius.stats,
     borderWidth: 1,
     borderColor: style.colors.border,
-    gap: style.spacing.lg
+    gap: style.spacing.md,
+  },
+  headerManageModal: {
+    alignItems: "center",
+    gap: style.spacing.xs,
+    marginBottom: style.spacing.sm,
+  },
+  circle: {
+    width: 50,
+    height: 50,
+    backgroundColor: style.colors.backgroundPrimary,
+    borderRadius: style.radius.circle,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: style.fontSize.xl,
-    fontWeight: "600",
+    fontWeight: style.fontWeight.bold,
     textAlign: "center",
     color: style.colors.text,
   },
-  pantryName: {
-    color: style.colors.primary,
+  subtitle: {
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.medium,
+    textAlign: "center",
+    color: style.colors.textSecondary,
+    paddingHorizontal: style.spacing.sm
   },
-  modalSeparatorTop: {
-    borderWidth: 1,
-    borderColor: style.colors.bgInput,
-  },
-  modalSeparatorBottom: {
-    borderWidth: 1,
-    borderColor: style.colors.bgInput,
-    marginVertical: style.spacing.xs,
-  },
+
   inviteCodeContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     gap: style.spacing.xs,
   },
   label: {
-    fontSize: style.fontSize.sm,
-    fontWeight: "600",
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.semibold,
     color: style.colors.text,
   },
   code: {
-    fontWeight: "600",
-    color: style.colors.green,
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.bold,
+    color: style.colors.primary,
   },
   scrollContent: {
     gap: style.spacing.md,
@@ -175,9 +202,9 @@ const styles = StyleSheet.create({
   },
   sectionRow: {
     height: style.controls.inputHeight,
-    backgroundColor: style.colors.bgInput,
+    backgroundColor: style.colors.background,
     paddingHorizontal: style.spacing.md,
-    paddingVertical: style.spacing.sm,
+    paddingVertical: style.spacing.md,
     borderRadius: style.radius.card,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -185,12 +212,12 @@ const styles = StyleSheet.create({
     gap: style.spacing.sm,
   },
   users: {
-    fontSize: style.fontSize.sm,
+    fontSize: style.fontSize.md,
     color: style.colors.text,
     flex: 1,
   },
   emptyText: {
-    fontSize: style.fontSize.sm,
+    fontSize: style.fontSize.md,
     color: style.colors.textSecondary,
   },
   actionButtons: {
@@ -198,51 +225,53 @@ const styles = StyleSheet.create({
     gap: style.spacing.sm,
   },
   acceptBtn: {
+    width: 26,
+    height: 26,
     backgroundColor: style.colors.green,
-    borderRadius: style.radius.control,
-    padding: style.spacing.xs,
+    borderRadius: style.radius.circle,
     justifyContent: "center",
     alignItems: "center"
   },
   rejectBtn: {
+    width: 26,
+    height: 26,
     backgroundColor: style.colors.error,
-    borderRadius: style.radius.control,
-    padding: style.spacing.xs,
+    borderRadius: style.radius.circle,
     justifyContent: "center",
     alignItems: "center",
   },
   trashButton: {
+    width: 26,
+    height: 26,
     backgroundColor: style.colors.error,
-    borderRadius: style.radius.control,
-    padding: style.spacing.xs,
+    borderRadius: style.radius.circle,
     justifyContent: "center",
     alignItems: "center",
   },
   footerButtons: {
+    marginTop: style.spacing.lg,
     flexDirection: "row",
     gap: style.spacing.sm,
   },
   deleteButton: {
-    height: style.controls.buttonHeight,
+    minHeight: style.controls.minimumTouchTarget,
     backgroundColor: style.colors.error,
-    borderRadius: style.radius.card,
+    borderRadius: style.radius.modal,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: 'center',
     flex: 1,
   },
   nullButton: {
-    height: style.controls.buttonHeight,
-    backgroundColor: style.colors.border,
-    borderWidth: 1,
-    borderColor: style.colors.border,
-    borderRadius: style.radius.card,
-    justifyContent: "center",
-    alignItems: "center",
+    minHeight: style.controls.minimumTouchTarget,
+    backgroundColor: style.colors.null,
+    borderRadius: style.radius.modal,
+    justifyContent: 'center',
+    alignItems: 'center',
     flex: 1,
   },
   textButton: {
-    fontSize: style.fontSize.sm,
-    fontWeight: "600",
     color: style.colors.surface,
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.semibold,
   },
 });

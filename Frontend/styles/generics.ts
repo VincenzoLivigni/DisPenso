@@ -1,7 +1,9 @@
 export const style = {
     colors: {
         primary: "#3baecb",
+        backgroundPrimary: "#3baecb35",
         green: "#63be3f",
+        backgroundGreen: "#63be3f25",
         cyanLight: "#d3ebef",
         greenLight: "#63be3f75",
         background: "#f1f3ee",
@@ -10,8 +12,10 @@ export const style = {
         bgDark: "#dddddd",
         text: "#202923",
         textSecondary: "#666",
+        null: "#cbcbcb",
         border: "#dbdfdd",
         error: "#cb3b3b",
+        backgroundError: "#cb3b3b25",
         warning: "#cbba3b",
         separatorDark: "#dbdfdd",
         shadow: "#000000"
@@ -39,6 +43,7 @@ export const style = {
         lg: 16,
         xl: 24,
         xxl: 32,
+        extra: 40
     },
     radius: {
         control: 8,
@@ -50,7 +55,7 @@ export const style = {
     controls: {
         buttonHeightSmall: 30,
         buttonHeight: 36,
-        inputHeight: 36,
+        inputHeight: 40,
         minimumTouchTarget: 44,
     },
 } as const;
