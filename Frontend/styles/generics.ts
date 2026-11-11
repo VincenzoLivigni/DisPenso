@@ -27,7 +27,7 @@ export const style = {
         lg: 18,
         xl: 20,
         xxl: 24,
-        title: 28,
+        title: 32,
     },
     fontWeight: {
         regular: "400",

@@ -4,196 +4,176 @@ import {
   TextInput,
   StyleSheet,
   Pressable,
+  ScrollView
 } from "react-native";
 
 import { style } from "../styles/generics";
 
-import { SortOption } from "../app/(tabs)/Dispense";
-
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 type FiltersProps = {
   search: string;
-  onChangeSearch: (text: string) => void;
-  sort: SortOption;
-  onSortChange: (sort: SortOption) => void;
+  onChangeSearch: (text: string) => void
+  sortName: "none" | "name-asc" | "name-desc"
+  onSortNameChange: (sort: "none" | "name-asc" | "name-desc") => void
+  sortQuantity: "none" | "qty-asc" | "qty-desc"
+  onSortQuantityChange: (sort: "none" | "qty-asc" | "qty-desc") => void
 };
 
 export default function Filters({
   search,
   onChangeSearch,
-  sort,
-  onSortChange,
+  sortName,
+  onSortNameChange,
+  sortQuantity,
+  onSortQuantityChange,
 }: FiltersProps) {
   function reset() {
     onChangeSearch("");
-    onSortChange("none");
+    onSortNameChange("none");
+    onSortQuantityChange("none");
   }
 
+  const hasActibeFilters = search.trim() !== "" || sortName !== "none" || sortQuantity !== "none"
+
   return (
-    <>
-      <View style={styles.filteredContainer}>
-        <View style={styles.filterTop}>
-          <View style={styles.filterTopLeft}>
-            <MaterialCommunityIcons name="tune-variant" size={20} color={style.colors.primary} style={{ marginTop: 4 }} />
+    <View style={styles.filteredContainer}>
 
-            <Text style={styles.title}>Filtra prodotti</Text>
-          </View>
+      <View style={styles.search}>
+        <Feather name="search" size={20} color={style.colors.textSecondary} />
 
-          <Pressable style={styles.resetButton} onPress={reset}>
-            <MaterialIcons name="refresh" size={20} color={style.colors.error} />
-            <Text style={styles.resetTextButton}>RESET</Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.search}>
-          <Text style={styles.label}>Cerca prodotto</Text>
-
-          <TextInput
-            placeholder="nome prodotto"
-            value={search}
-            onChangeText={onChangeSearch}
-            placeholderTextColor={style.colors.textSecondary}
-            style={styles.input}
-          />
-        </View>
-
-        {/* BOTTONI PER IL SORT */}
-        <View style={styles.sortSection}>
-          <Text style={styles.label}>Ordina per</Text>
-
-          <View style={styles.actionContainer}>
-
-            <Pressable
-              style={[styles.button, sort === "name-asc" && styles.activeButton]}
-              onPress={() =>
-                onSortChange(sort === "name-asc" ? "none" : "name-asc")
-              }>
-              <Text style={[styles.textButton, sort === "name-asc" && styles.activeTextButton]}>A - Z</Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.button, sort === "name-desc" && styles.activeButton]}
-              onPress={() =>
-                onSortChange(sort === "name-desc" ? "none" : "name-desc")
-              }>
-              <Text style={[styles.textButton, sort === "name-desc" && styles.activeTextButton]}>Z - A</Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.button, sort === "qty-desc" && styles.activeButton]}
-              onPress={() =>
-                onSortChange(sort === "qty-desc" ? "none" : "qty-desc")
-              }>
-              <Text style={[styles.textButton, sort === "qty-desc" && styles.activeTextButton]}>Quantità +</Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.button, sort === "qty-asc" && styles.activeButton]}
-              onPress={() =>
-                onSortChange(sort === "qty-asc" ? "none" : "qty-asc")
-              }>
-              <Text style={[styles.textButton, sort === "qty-asc" && styles.activeTextButton]}>Quantità -</Text>
-            </Pressable>
-          </View>
-
-        </View>
-
+        <TextInput
+          placeholder="Cerca prodotto..."
+          value={search}
+          onChangeText={onChangeSearch}
+          placeholderTextColor={style.colors.textSecondary}
+          style={styles.input}
+        />
       </View>
-    </>
+
+      {/* BOTTONI PER IL SORT */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.actionContainer}
+      >
+        {!hasActibeFilters ? (
+          <Pressable style={[styles.button, sortName === "none" && sortQuantity === "none" && styles.activeButton]}
+            onPress={() => {
+              onSortNameChange("none");
+              onSortQuantityChange("none");
+            }}>
+            <Text style={[styles.textButton, sortName === "none" && sortQuantity === "none" && styles.activeTextButton]}>Tutti</Text>
+          </Pressable>
+        ) : (
+          <Pressable style={styles.resetButton}
+            onPress={reset}>
+            <MaterialIcons name="refresh" size={18} color={style.colors.error} />
+            <Text style={styles.resetTextButton}>Reset</Text>
+          </Pressable>
+        )}
+
+        <Pressable
+          style={[styles.button, sortName === "name-asc" && styles.activeButton]}
+          onPress={() =>
+            onSortNameChange(sortName === "name-asc" ? "none" : "name-asc")
+          }>
+          <Text style={[styles.textButton, sortName === "name-asc" && styles.activeTextButton]}>A - Z</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button, sortName === "name-desc" && styles.activeButton]}
+          onPress={() =>
+            onSortNameChange(sortName === "name-desc" ? "none" : "name-desc")
+          }>
+          <Text style={[styles.textButton, sortName === "name-desc" && styles.activeTextButton]}>Z - A</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button, sortQuantity === "qty-asc" && styles.activeButton]}
+          onPress={() =>
+            onSortQuantityChange(sortQuantity === "qty-asc" ? "none" : "qty-asc")
+          }>
+          <Text style={[styles.textButton, sortQuantity === "qty-asc" && styles.activeTextButton]}>Quantità +</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button, sortQuantity === "qty-desc" && styles.activeButton]}
+          onPress={() =>
+            onSortQuantityChange(sortQuantity === "qty-desc" ? "none" : "qty-desc")
+          }>
+          <Text style={[styles.textButton, sortQuantity === "qty-desc" && styles.activeTextButton]}>Quantità -</Text>
+        </Pressable>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   filteredContainer: {
-    marginHorizontal: style.spacing.md,
     marginVertical: style.spacing.md,
-    padding: style.spacing.md,
-    paddingBottom: style.spacing.lg,
-    backgroundColor: style.colors.surface,
-    borderRadius: style.radius.stats,
-    borderWidth: 1,
-    borderColor: style.colors.border,
     gap: style.spacing.md,
   },
-  filterTop: {
-    borderBottomWidth: 2,
-    borderBottomColor: style.colors.bgInput,
-    paddingBottom: style.spacing.md,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  filterTopLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: style.spacing.sm
-  },
-  title: {
-    fontSize: style.fontSize.lg,
-    fontWeight: "600",
-    color: style.colors.text,
-  },
-  resetButton: {
+  search: {
     height: style.controls.buttonHeight,
     backgroundColor: style.colors.surface,
     borderWidth: 1,
     borderColor: style.colors.border,
-    borderRadius: style.radius.card,
-    paddingHorizontal: style.spacing.sm,
+    borderRadius: style.radius.stats,
+    paddingHorizontal: style.spacing.md,
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    gap: style.spacing.xs,
-  },
-  resetTextButton: {
-    fontWeight: "600",
-    color: style.colors.error,
-  },
-  search: {
     gap: style.spacing.sm,
-  },
-  label: {
-    fontSize: style.fontSize.sm,
-    color: style.colors.text,
   },
   input: {
-    height: style.controls.inputHeight,
-    backgroundColor: style.colors.bgInput,
+    height: "100%",
+    fontSize: style.fontSize.md,
     color: style.colors.text,
-    paddingVertical: style.spacing.sm,
-    paddingHorizontal: style.spacing.md,
-    borderWidth: 1,
-    borderColor: style.colors.border,
-    borderRadius: style.radius.card,
-  },
-  sortSection: {
-    gap: style.spacing.sm,
+    flex: 1,
   },
   actionContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: style.spacing.xs,
+    gap: style.spacing.sm,
   },
   button: {
+    minWidth: 70,
     height: style.controls.buttonHeight,
-    backgroundColor: style.colors.greenLight,
-    borderRadius: style.radius.card,
-    flex: 1,
+    backgroundColor: style.colors.surface,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    borderRadius: style.radius.circle,
+    paddingHorizontal: style.spacing.md,
     justifyContent: "center",
     alignItems: "center",
   },
   activeButton: {
-    backgroundColor: style.colors.green,
+    backgroundColor: style.colors.primary,
   },
   textButton: {
-    fontSize: style.fontSize.xs,
-    fontWeight: "600",
+    fontSize: style.fontSize.sm,
+    fontWeight: style.fontWeight.semibold,
     textAlign: "center",
     color: style.colors.textSecondary,
   },
   activeTextButton: {
     color: style.colors.surface,
-  }
+  },
+  resetButton: {
+    minWidth: 70,
+    height: style.controls.buttonHeight,
+    backgroundColor: "#f3626220",
+    borderRadius: style.radius.circle,
+    paddingHorizontal: style.spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: style.spacing.xs,
+  },
+  resetTextButton: {
+    fontSize: style.fontSize.sm,
+    fontWeight: style.fontWeight.semibold,
+    color: style.colors.error,
+  },
 });

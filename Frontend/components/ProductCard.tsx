@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
         elevation: 2
     },
     image: {
-        width: 65,
-        height: 65,
+        minWidth: 70,
+        minHeight: 70,
         backgroundColor: "#f0e5d7",
         borderRadius: style.radius.card,
     },
@@ -89,22 +89,22 @@ const styles = StyleSheet.create({
         gap: style.spacing.xs,
     },
     productName: {
-        fontSize: style.fontSize.sm,
+        fontSize: style.fontSize.md,
         fontWeight: style.fontWeight.semibold,
         color: style.colors.text,
     },
     productQuantity: {
-        fontSize: style.fontSize.sm,
+        fontSize: style.fontSize.md,
         fontWeight: style.fontWeight.semibold,
         color: style.colors.textSecondary,
     },
     badgeText: {
-        fontSize: style.fontSize.sm,
+        fontSize: style.fontSize.md,
         fontWeight: style.fontWeight.semibold,
     },
     buttonMenu: {
-        width: 32,
-        height: 32,
+        width: 36,
+        height: 36,
         backgroundColor: style.colors.background,
         borderWidth: 1,
         borderColor: style.colors.border,

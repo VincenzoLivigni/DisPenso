@@ -8,6 +8,7 @@ import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 import { useState } from "react";
 
 // componenti app
+import Filters from "../../components/FIlters";
 import ProductCard from "../../components/ProductCard";
 import EditProductModal from "../../components/EditProductModal";
 import DeleteProductModal from "../../components/DeleteProductModal";
@@ -25,6 +26,8 @@ import Feather from '@expo/vector-icons/Feather';
 // tipi
 import { usePantry } from "../../contexts/pantryContext";
 import type { DataPantryItems } from "../../contexts/pantryContext";
+
+export type SortOption = "none" | "name-asc" | "name-desc" | "qty-asc" | "qty-desc";
 
 export default function DettaglioDispensa() {
     // estraggo l'ID dall'URL della rotta
@@ -52,6 +55,37 @@ export default function DettaglioDispensa() {
     const handleOpenDetail = (itemId: number) => {
         router.push(`/product/${itemId}`);
     };
+
+    // FILTRI
+    const [searchProduct, setSearchProduct] = useState("");
+    const [sortName, setSortName] = useState<"none" | "name-asc" | "name-desc">("none");
+    const [sortQuantity, setSortQuantity] = useState<"none" | "qty-asc" | "qty-desc">("none");
+
+    const cleanSearch = searchProduct.toLowerCase().trim();
+
+    const filteredProducts = pantryProducts.filter((p) => p.name.toLocaleLowerCase().includes(cleanSearch))
+
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+        let primaryComparison = 0;
+
+        if (sortQuantity === "qty-desc") {
+            primaryComparison = b.quantity - a.quantity;
+        } else if (sortQuantity === "qty-asc") {
+            primaryComparison = a.quantity - b.quantity;
+        }
+
+        if (primaryComparison !== 0) {
+            return primaryComparison;
+        }
+
+        if (sortName === "name-asc") {
+            return a.name.localeCompare(b.name);
+        } else if (sortName === "name-desc") {
+            return b.name.localeCompare(a.name);
+        }
+
+        return 0;
+    })
 
     // MODALI
     // stati per menu delle azioni del prodotto
@@ -140,7 +174,7 @@ export default function DettaglioDispensa() {
 
                     <View style={styles.membersInfo}>
 
-                        <FontAwesome5 name="user-friends" size={14} color={style.colors.primary} />
+                        <FontAwesome5 name="user-friends" size={16} color={style.colors.primary} />
                         <Text style={styles.membersText}>
                             {countMembers} {countMembers === 1 ? "membro" : "membri"}
                         </Text>
@@ -149,27 +183,40 @@ export default function DettaglioDispensa() {
                     <View style={styles.separator}></View>
 
                     <View style={styles.productsHeader}>
-                        <Text style={styles.productsTitle}>
-                            <Feather name="package" size={20} color={style.colors.primary} />{" "}
-                            Prodotti presenti
-                        </Text>
+                        <View style={styles.productsTitleContainer}>
+                            <Feather name="package" size={23} color={style.colors.primary} />
+
+                            <Text style={styles.productsTitle}>Prodotti presenti</Text>
+                        </View>
 
                         <Text style={styles.productsCount}>
                             {countProducts} {countProducts === 1 ? "prodotto" : "prodotti"}
                         </Text>
                     </View>
 
+                    {/* FILTRI */}
+                    <Filters
+                        search={searchProduct}
+                        onChangeSearch={setSearchProduct}
+                        sortName={sortName}
+                        onSortNameChange={setSortName}
+                        sortQuantity={sortQuantity}
+                        onSortQuantityChange={setSortQuantity}
+                    />
 
                     {pantryProducts.length > 0 ? (
-                        pantryProducts.map((p) => (
-                            <ProductCard
-                                key={p.item_id}
-                                product={p}
-                                onPress={() => handleOpenDetail(p.item_id)}
-                                onPressMenu={() => handleOpenMenu(p.item_id)}
-                            />
-                        ))
-                    ) : (
+                        sortedProducts.length > 0 ? (
+                            sortedProducts.map((p) => (
+                                <ProductCard
+                                    key={p.item_id}
+                                    product={p}
+                                    onPress={() => handleOpenDetail(p.item_id)}
+                                    onPressMenu={() => handleOpenMenu(p.item_id)}
+                                />
+                            ))
+                        ) : (
+                            <Text>Nessun prodotto trovatp</Text>
+                        )) : (
                         <Text>Nessun prodotto presente</Text>
                     )}
 
@@ -291,20 +338,24 @@ const styles = StyleSheet.create({
         marginVertical: style.spacing.lg,
     },
     productsHeader: {
-        marginBottom: style.spacing.md,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
+    productsTitleContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: style.spacing.sm,
+    },
     productsTitle: {
-        fontSize: style.fontSize.md,
+        fontSize: style.fontSize.xl,
         fontWeight: style.fontWeight.bold,
         color: style.colors.text,
         letterSpacing: -0.2,
     },
     productsCount: {
-        fontSize: style.fontSize.xs,
-        fontWeight: style.fontWeight.bold,
+        fontSize: style.fontSize.sm,
+        fontWeight: style.fontWeight.semibold,
         backgroundColor: style.colors.cyanLight,
         color: style.colors.primary,
         paddingVertical: style.spacing.xs,
