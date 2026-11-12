@@ -156,7 +156,7 @@ export default function DettaglioDispensa() {
                 {/* azioni pagina*/}
                 <View style={styles.headerActions}>
                     <Pressable
-                        onPress={() => router.back()}
+                        onPress={() => router.replace("/(tabs)/Dispense")}
                         style={styles.actionButtons}>
                         <FontAwesome6 name="chevron-left" size={20} color={style.colors.primary} />
                     </Pressable>

@@ -181,7 +181,7 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
         await loadPantries();
       }
     } catch (err) {
-      Alert.alert("Errore", "Impossibile creare la dispensa");
+      throw err
     }
   };
 
@@ -253,7 +253,8 @@ export const PantryProvider = ({ children }: { children: ReactNode }) => {
       await loadPantries();
     } catch (err) {
       console.log("Errore", err);
-      Alert.alert("Errore", "Impossibile unirsi alla dispensa");
+      throw err
+
     }
   };
 

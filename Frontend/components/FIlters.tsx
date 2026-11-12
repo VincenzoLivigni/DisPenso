@@ -41,7 +41,7 @@ export default function Filters({
     <View style={styles.filteredContainer}>
 
       <View style={styles.search}>
-        <Feather name="search" size={20} color={style.colors.textSecondary} />
+        <Feather name="search" size={18} color={style.colors.textSecondary} />
 
         <TextInput
           placeholder="Cerca prodotto..."
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     gap: style.spacing.md,
   },
   search: {
-    height: style.controls.buttonHeight,
+    height: style.controls.inputHeight,
     backgroundColor: style.colors.surface,
     borderWidth: 1,
     borderColor: style.colors.border,
@@ -125,6 +125,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: style.spacing.sm,
+
+    shadowColor: style.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2
   },
   input: {
     height: "100%",
@@ -139,7 +145,7 @@ const styles = StyleSheet.create({
   },
   button: {
     minWidth: 70,
-    height: style.controls.buttonHeight,
+    height: style.controls.inputHeight,
     backgroundColor: style.colors.surface,
     borderWidth: 1,
     borderColor: style.colors.border,
@@ -147,6 +153,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: style.spacing.md,
     justifyContent: "center",
     alignItems: "center",
+
+    shadowColor: style.colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2
   },
   activeButton: {
     backgroundColor: style.colors.primary,
