@@ -1,23 +1,25 @@
-import { useLocalSearchParams, Stack, useRouter } from "expo-router";
-import { usePantry } from "../../contexts/pantryContext";
-import { LinearGradient } from "expo-linear-gradient";
-import {
-  ScrollView,
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
-} from "react-native";
-import Header from "../../components/Header";
+// compnenti React Native
+import { ScrollView, View, Text, Image, StyleSheet, Pressable } from "react-native";
 
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+// navigazione app
+import { useLocalSearchParams, Stack, useRouter } from "expo-router";
+
+// stili
+import { style } from "../../styles/generics";
+
+// icone
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
+// componenti app
 const placeholder = require("../../assets/placeholder.png");
 import { expirationBadge } from "../../services/utils";
 
+// tipi 
+import { usePantry } from "../../contexts/pantryContext";
+
 export default function DettaglioProdotto() {
   // Estraiamo l'ID dall'URL della rotta
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, pantryId } = useLocalSearchParams<{ id: string, pantryId: string }>();
   const { getProductById } = usePantry();
   const router = useRouter();
 
@@ -37,271 +39,305 @@ export default function DettaglioProdotto() {
 
   return (
     <>
-      <Header />
       <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.headerActions}>
+          <Pressable
+            onPress={() => router.replace(`/pantry/${pantryId}`)}
+            style={styles.actionButtons}>
+            <FontAwesome6 name="chevron-left" size={20} color={style.colors.primary} />
+          </Pressable>
+        </View>
+
         <View style={styles.imageContainer}>
           <Image
             source={
               product?.image_url ? { uri: product?.image_url } : placeholder
             }
             style={styles.image}
-            resizeMode="contain"
+            resizeMode="cover"
           />
         </View>
 
-        <View style={styles.separator}></View>
+        <View style={styles.productDetails}>
 
-        <Text style={styles.title}>{product?.name}</Text>
+          <View style={styles.separator} />
 
-        <View style={styles.infoProduct}>
-          <Text style={styles.label}>Scadenza:</Text>
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor: badge.bg,
-                borderLeftColor: badge.border,
-                borderRightColor: badge.border,
-              },
-            ]}
-          >
-            <Text style={[styles.badgeText, { color: badge.color }]}>
-              {badge.text}
-            </Text>
-          </View>
-        </View>
+          <Text style={styles.title}>{product?.name}</Text>
 
-        <View style={styles.infoProduct}>
-          <Text style={styles.label}>Quantità:</Text>
-          <Text style={styles.value}>{product?.quantity}</Text>
-        </View>
+          <View style={styles.mainInfoContainer}>
+            <Text style={styles.mainInfoTitle}>Informazioni principali</Text>
 
-        <View style={styles.infoProduct}>
-          <Text style={styles.label}>Aggiunto il:</Text>
-          <Text style={styles.value}>
-            {product?.added_at
-              ? product.added_at.split("T")[0].split("-").reverse().join("/")
-              : "-"}
-          </Text>
-        </View>
+            <View style={styles.mainInfo}>
+              <View style={styles.infoProduct}>
+                <Text style={styles.label}>Scadenza:</Text>
 
-        <View style={styles.infoProduct}>
-          <Text style={styles.label}>Marca:</Text>
-          <Text style={styles.value}>{product?.brand ?? "0"}</Text>
-        </View>
+                <Text style={[styles.badgeText, { color: badge.color }]}>{badge.text}</Text>
+              </View>
 
-        <View style={styles.infoProduct}>
-          <Text style={styles.label}>Ingredienti:</Text>
-          <Text style={styles.longText}>
-            {formattedIngredients(product?.ingredients || "")}
-          </Text>
-        </View>
+              <View style={styles.infoSeparator} />
 
-        {product?.nutrition && (
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>
-              Valori Nutrizionali (per 100g)
-            </Text>
-            <View style={styles.nutritionCard}>
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Energia</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.energy_kcal ?? "0"} kcal
+              <View style={styles.infoProduct}>
+                <Text style={styles.label}>Quantità:</Text>
+                <Text style={styles.value}>{product?.quantity}</Text>
+              </View>
+
+              <View style={styles.infoSeparator} />
+
+              <View style={styles.infoProduct}>
+                <Text style={styles.label}>Aggiunto il:</Text>
+                <Text style={styles.value}>
+                  {product?.added_at
+                    ? product.added_at.split("T")[0].split("-").reverse().join("/")
+                    : "-"}
                 </Text>
               </View>
 
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Grassi</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.fat ?? "0"} g
-                </Text>
-              </View>
+              <View style={styles.infoSeparator} />
 
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>
-                  Di cui acidi grassi saturi
-                </Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.saturated_fat ?? "0"} g
-                </Text>
-              </View>
-
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Carboidrati</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.carbohydrates ?? "0"} g
-                </Text>
-              </View>
-
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Di cui zuccheri</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.sugars ?? "0"} g
-                </Text>
-              </View>
-
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Fibre</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.fiber ?? "0"} g
-                </Text>
-              </View>
-
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Proteine</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.proteins ?? "0"} g
-                </Text>
-              </View>
-
-              <View style={[styles.nutritionRow, styles.lastNutritionRow]}>
-                <Text style={styles.nutritionLabel}>Sale</Text>
-                <Text style={styles.nutritionValue}>
-                  {product.nutrition.salt ?? "0"} g
-                </Text>
+              <View style={styles.infoProduct}>
+                <Text style={styles.label}>Marca:</Text>
+                <Text style={styles.value}>{product?.brand ?? "0"}</Text>
               </View>
             </View>
           </View>
-        )}
-      </ScrollView>
 
-      <View style={styles.floatingButtonContainer}>
-        <Pressable onPress={() => router.replace("/Dispense")}>
-          <LinearGradient
-            colors={[
-              "rgba(59, 175, 203, 1)",
-              "rgba(71, 179, 161, 1)",
-              "rgba(99, 190, 63, 1)",
-            ]}
-            locations={[0, 0.5, 1]}
-            start={{ x: 0.2, y: 1 }}
-            end={{ x: 0.8, y: 0 }}
-            style={styles.backButton}
-          >
-            <MaterialIcons name="arrow-back" size={24} color="white" />
-            <Text style={styles.backText}>Torna alle dispense</Text>
-          </LinearGradient>
-        </Pressable>
-      </View>
+          <View style={styles.ingredientsContainer}>
+            <Text style={styles.ingredientsTitle}>Ingredienti:</Text>
+            <Text style={styles.ingredientsText}>
+              {formattedIngredients(product?.ingredients || "") || "Non disponibili"}
+            </Text>
+          </View>
+
+
+          {product?.nutrition && (
+            <View style={styles.nutritionContainer}>
+              <View style={styles.nutritionHeader}>
+                <Text style={styles.nutritionTitle}>Valori Nutrizionali</Text>
+                <Text style={styles.nutritionSubtitle}>(per 100g)</Text>
+              </View>
+
+              <View style={styles.nutritionCard}>
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Energia</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.energy_kcal ?? "0"} kcal</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Grassi</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.fat ?? "0"} g</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>
+                    Di cui acidi grassi saturi
+                  </Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.saturated_fat ?? "0"} g</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Carboidrati</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.carbohydrates ?? "0"} g</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Di cui zuccheri</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.sugars ?? "0"} g</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Fibre</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.fiber ?? "0"} g</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Proteine</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.proteins ?? "0"} g</Text>
+                </View>
+
+                <View style={styles.infoSeparator} />
+
+                <View style={styles.nutritionRow}>
+                  <Text style={styles.nutritionLabel}>Sale</Text>
+                  <Text style={styles.nutritionValue}>{product.nutrition.salt ?? "0"} g</Text>
+                </View>
+              </View>
+            </View>
+          )}
+        </View>
+      </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    marginBottom: 70,
+  scrollContent: {
+    paddingBottom: style.spacing.xxl
   },
-  center: {
-    flex: 1,
-    justifyContent: "center",
+  container: {
+    backgroundColor: style.colors.background,
+    flex: 1
+  },
+  headerActions: {
+    padding: style.spacing.md,
+    marginBottom: style.spacing.sm,
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+  },
+  actionButtons: {
+    width: 45,
+    height: 45,
+    backgroundColor: style.colors.surface,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    borderRadius: style.radius.circle,
+    alignItems: "center",
+    justifyContent: "center",
+
+    shadowColor: style.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2
   },
   imageContainer: {
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: style.spacing.lg,
   },
   image: {
-    width: 200,
-    height: 200,
-    borderRadius: 12,
+    width: 300,
+    height: 300,
+    borderRadius: style.radius.stats,
+  },
+  productDetails: {
+    marginHorizontal: style.spacing.md,
   },
   separator: {
     height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 16,
+    backgroundColor: style.colors.separatorDark,
+    marginVertical: style.spacing.lg,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 16,
+    fontSize: style.fontSize.xxl,
+    fontWeight: style.fontWeight.bold,
+    color: style.colors.text,
+    marginBottom: style.spacing.md,
+  },
+  mainInfoContainer: {
+    backgroundColor: style.colors.surface,
+    borderRadius: style.radius.stats,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    padding: style.spacing.md,
+    gap: style.spacing.lg,
+  },
+  mainInfo: {
+    gap: style.spacing.md,
+  },
+  mainInfoTitle: {
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.bold,
+    color: style.colors.text,
   },
   infoProduct: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 6,
+    alignItems: "center",
   },
   label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#555",
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.semibold,
+    color: style.colors.textSecondary,
   },
   value: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.semibold,
+    color: style.colors.text,
   },
-  sectionContainer: {
-    marginTop: 24,
+  infoSeparator: {
+    height: 1,
+    backgroundColor: style.colors.separatorLight,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#222",
-    marginBottom: 8,
-    paddingHorizontal: 4,
+  ingredientsContainer: {
+    backgroundColor: style.colors.surface,
+    borderRadius: style.radius.stats,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    marginTop: style.spacing.lg,
+    padding: style.spacing.md,
+    gap: style.spacing.xs,
   },
-  longText: {
-    width: 150,
+  ingredientsTitle: {
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.bold,
+    color: style.colors.text,
+  },
+  ingredientsText: {
+    fontSize: style.fontSize.md,
+    color: style.colors.textSecondary,
+    lineHeight: 24
+  },
+  nutritionContainer: {
+    backgroundColor: style.colors.surface,
+    borderRadius: style.radius.stats,
+    borderWidth: 1,
+    borderColor: style.colors.border,
+    marginTop: style.spacing.lg,
+    padding: style.spacing.md,
+    gap: style.spacing.lg,
+  },
+  nutritionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  nutritionTitle: {
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.bold,
+    color: style.colors.text,
+  },
+  nutritionSubtitle: {
+    fontSize: style.fontSize.sm,
+    color: style.colors.textSecondary,
   },
   nutritionCard: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    gap: style.spacing.sm,
   },
   nutritionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  lastNutritionRow: {
-    borderBottomWidth: 0,
+    alignItems: "center",
+    paddingVertical: style.spacing.xs,
   },
   nutritionLabel: {
-    color: "#555",
-    fontSize: 16,
+    fontSize: style.fontSize.md,
+    color: style.colors.textSecondary,
+    flex: 1,
   },
   nutritionValue: {
-    fontWeight: "600",
-    color: "#333",
-    fontSize: 16,
-  },
-  floatingButtonContainer: {
-    position: "absolute",
-    bottom: 40,
-    right: 20,
-    zIndex: 10,
-  },
-  backButton: {
-    flexDirection: "row",
-    padding: 8,
-    borderRadius: 20,
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  backText: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: "white",
-    marginLeft: 8,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-    borderLeftWidth: 3,
-    borderRightWidth: 3,
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.semibold,
+    color: style.colors.text,
   },
   badgeText: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: style.fontSize.md,
+    fontWeight: style.fontWeight.semibold,
   },
 });

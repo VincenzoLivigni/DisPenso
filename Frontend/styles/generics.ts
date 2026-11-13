@@ -18,6 +18,7 @@ export const style = {
         backgroundError: "#cb3b3b25",
         warning: "#cbba3b",
         separatorDark: "#dbdfdd",
+        separatorLight: "#eee",
         shadow: "#000000"
     },
     fontSize: {

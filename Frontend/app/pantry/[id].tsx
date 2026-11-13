@@ -53,7 +53,7 @@ export default function DettaglioDispensa() {
 
     // rotta per dettaglio prdototto
     const handleOpenDetail = (itemId: number) => {
-        router.push(`/product/${itemId}`);
+        router.push(`/product/${itemId}?pantryId=${paramsId}`);
     };
 
     // FILTRI
