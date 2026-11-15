@@ -96,76 +96,78 @@ export default function Dispense() {
 
 
       <View style={styles.pantriesContainer}>
+        <FlatList
+          data={visiblePantries}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.pantriesContent}
 
-        <View style={styles.pantriesContent}>
-          {isSearchEmpty ? (
-            <Text style={styles.notFoundText}>Nessuna dispensa trovata</Text>
-          ) : (
-            <FlatList
-              data={visiblePantries}
-              keyExtractor={(item) => item.id.toString()}
-              ItemSeparatorComponent={() => (
-                <View style={{ height: style.spacing.md }} />
-              )}
-              renderItem={({ item }) => (
-                <Pressable style={styles.pantryCard} onPress={() => handleOpenDetail(item.id)}>
-                  <Text style={styles.pantriesTitle}>{item.name}</Text>
+          ListEmptyComponent={
+            isSearchEmpty ? (
+              <Text style={styles.notFoundText}>Nessuna dispensa trovata</Text>
+            ) : null
+          }
 
-                  <View style={styles.pantryInfo}>
-                    <View style={styles.pantryInfoItem}>
-                      <Feather name="box" size={16} color={style.colors.primary} />
-                      <Text style={styles.pantryInfoText}>
-                        {products[item.id].length || 0} prodotti
-                      </Text>
-                    </View>
-
-                    <View style={styles.pantryInfoItem}>
-                      <FontAwesome5 name="user-friends" size={16} color={style.colors.primary} />
-                      <Text style={styles.pantryInfoText}>
-                        {pantryMembersDetails[item.id].length} membri
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-              )}
-            />
+          ItemSeparatorComponent={() => (
+            <View style={{ height: style.spacing.md }} />
           )}
-        </View>
 
+          renderItem={({ item }) => (
+            <Pressable style={styles.pantryCard} onPress={() => handleOpenDetail(item.id)}>
+              <Text style={styles.pantriesTitle}>{item.name}</Text>
+
+              <View style={styles.pantryInfo}>
+                <View style={styles.pantryInfoItem}>
+                  <Feather name="box" size={16} color={style.colors.primary} />
+                  <Text style={styles.pantryInfoText}>
+                    {products[item.id]?.length || 0} prodotti
+                  </Text>
+                </View>
+
+                <View style={styles.pantryInfoItem}>
+                  <FontAwesome5 name="user-friends" size={16} color={style.colors.primary} />
+                  <Text style={styles.pantryInfoText}>
+                    {pantryMembersDetails[item.id]?.length} membri
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          )}
+
+          ListFooterComponent={
+            <View style={styles.joinContainer}>
+              <View style={styles.joinHeader}>
+                <FontAwesome5 name="user-friends" size={36} color={style.colors.primary} style={{ paddingHorizontal: style.spacing.xl }} />
+
+                <View style={styles.joinHeaderText}>
+                  <Text style={styles.joinTitle}>Unisciti a una dispensa</Text>
+                  <Text style={styles.joinSubtitle}>Inserisci il codice di una dispensa esistente per accedere</Text>
+                </View>
+              </View>
+
+              <View style={styles.joinForm}>
+                <View style={styles.joinInputContainer}>
+                  <AntDesign name="link" size={18} color={style.colors.textSecondary} />
+
+                  <TextInput
+                    placeholder="Inserisci il codice d'invio..."
+                    value={joinCode}
+                    onChangeText={setJoinCode}
+                    style={styles.joinInput}
+                    placeholderTextColor={style.colors.textSecondary}
+                  />
+                </View>
+
+                <Pressable
+                  style={styles.joinButton}
+                  onPress={onJoinSubmit}
+                >
+                  <Text style={styles.joinButtonText}>Invia</Text>
+                </Pressable>
+              </View>
+            </View>
+          }
+        />
       </View>
-
-      <View style={styles.joinContainer}>
-        <View style={styles.joinHeader}>
-          <FontAwesome5 name="user-friends" size={36} color={style.colors.primary} style={{ paddingHorizontal: style.spacing.xl }} />
-
-          <View style={styles.joinHeaderText}>
-            <Text style={styles.joinTitle}>Unisciti a una dispensa</Text>
-            <Text style={styles.joinSubtitle}>Inserisci il codice di una dispensa esistente per accedere</Text>
-          </View>
-        </View>
-
-        <View style={styles.joinForm}>
-          <View style={styles.joinInputContainer}>
-            <AntDesign name="link" size={18} color={style.colors.textSecondary} />
-
-            <TextInput
-              placeholder="Inserisci il codice d'invio..."
-              value={joinCode}
-              onChangeText={setJoinCode}
-              style={styles.joinInput}
-              placeholderTextColor={style.colors.textSecondary}
-            />
-          </View>
-
-          <Pressable
-            style={styles.joinButton}
-            onPress={onJoinSubmit}
-          >
-            <Text style={styles.joinButtonText}>Invia</Text>
-          </Pressable>
-        </View>
-      </View>
-
     </View>
   );
 }
@@ -201,12 +203,6 @@ const styles = StyleSheet.create({
     borderRadius: style.radius.circle,
     alignItems: "center",
     justifyContent: "center",
-
-    shadowColor: style.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2
   },
   search: {
     height: style.controls.inputHeight,
@@ -219,12 +215,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: style.spacing.sm,
-
-    shadowColor: style.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2
   },
   input: {
     height: "100%",
@@ -233,6 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pantriesContainer: {
+    flex: 1
   },
   pantriesContent: {
     flex: 1,
@@ -244,12 +235,6 @@ const styles = StyleSheet.create({
     borderColor: style.colors.border,
     borderRadius: style.radius.stats,
     padding: style.spacing.md,
-
-    shadowColor: style.colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2
   },
   pantriesTitle: {
     fontSize: style.fontSize.xl,
@@ -282,8 +267,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: style.colors.border,
     borderRadius: style.radius.stats,
-    marginHorizontal: style.spacing.md,
-    marginBottom: style.spacing.md,
+    marginVertical: style.spacing.md,
     padding: style.spacing.md,
     gap: style.spacing.sm,
   },

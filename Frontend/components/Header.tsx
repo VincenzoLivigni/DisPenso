@@ -8,7 +8,7 @@ export default function Header() {
 
     return (
         // per adattare l'header a schermi mobile
-        <SafeAreaView>
+        <SafeAreaView edges={["top"]}>
             <View style={styles.headerContainer}>
                 <View style={styles.headerLeft}>
                     <Image
@@ -34,13 +34,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         flexDirection: "row",
         justifyContent: "space-between",
-        shadowColor: "black",
-        shadowOpacity: 0.075,
-        shadowRadius: 2,
-        shadowOffset: {
-            width: 0,
-            height: 2
-        }
     },
     headerLeft: {
         flexDirection: "row",

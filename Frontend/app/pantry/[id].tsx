@@ -1,6 +1,8 @@
 // compnenti React Native
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 // navigazione app
 import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 
@@ -150,84 +152,86 @@ export default function DettaglioDispensa() {
         <>
             <Stack.Screen options={{ headerShown: false }} />
 
-            <ScrollView
-                style={styles.mainContainer}
-                contentContainerStyle={{ paddingBottom: style.spacing.xl }}>
-                {/* azioni pagina*/}
-                <View style={styles.headerActions}>
-                    <Pressable
-                        onPress={() => router.replace("/(tabs)/Dispense")}
-                        style={styles.actionButtons}>
-                        <FontAwesome6 name="chevron-left" size={20} color={style.colors.primary} />
-                    </Pressable>
+            <SafeAreaView style={{ flex: 1, backgroundColor: style.colors.background }}>
+                <ScrollView
+                    style={styles.mainContainer}
+                    contentContainerStyle={{ paddingBottom: style.spacing.xl }}>
+                    {/* azioni pagina*/}
+                    <View style={styles.headerActions}>
+                        <Pressable
+                            onPress={() => router.replace("/(tabs)/Dispense")}
+                            style={styles.actionButtons}>
+                            <FontAwesome6 name="chevron-left" size={20} color={style.colors.primary} />
+                        </Pressable>
 
-                    <Pressable
-                        onPress={() => setIsOpenManageMemberModals(true)}
-                        style={styles.actionButtons}>
-                        <FontAwesome5 name="user-friends" size={20} color={style.colors.primary} />
-                    </Pressable>
-                </View>
-
-                {/* intestazione dispensa */}
-                <View style={styles.pantryHeader}>
-                    <Text style={styles.pantryName}>{actualPantry?.name}</Text>
-
-                    <View style={styles.membersInfo}>
-
-                        <FontAwesome5 name="user-friends" size={16} color={style.colors.primary} />
-                        <Text style={styles.membersText}>
-                            {countMembers} {countMembers === 1 ? "membro" : "membri"}
-                        </Text>
+                        <Pressable
+                            onPress={() => setIsOpenManageMemberModals(true)}
+                            style={styles.actionButtons}>
+                            <FontAwesome5 name="user-friends" size={20} color={style.colors.primary} />
+                        </Pressable>
                     </View>
 
-                    <View style={styles.separator}></View>
+                    {/* intestazione dispensa */}
+                    <View style={styles.pantryHeader}>
+                        <Text style={styles.pantryName}>{actualPantry?.name}</Text>
 
-                    <View style={styles.productsHeader}>
-                        <View style={styles.productsTitleContainer}>
-                            <Feather name="package" size={23} color={style.colors.primary} />
+                        <View style={styles.membersInfo}>
 
-                            <Text style={styles.productsTitle}>Prodotti presenti</Text>
+                            <FontAwesome5 name="user-friends" size={16} color={style.colors.primary} />
+                            <Text style={styles.membersText}>
+                                {countMembers} {countMembers === 1 ? "membro" : "membri"}
+                            </Text>
                         </View>
 
-                        <Text style={styles.productsCount}>
-                            {countProducts} {countProducts === 1 ? "prodotto" : "prodotti"}
-                        </Text>
+                        <View style={styles.separator}></View>
+
+                        <View style={styles.productsHeader}>
+                            <View style={styles.productsTitleContainer}>
+                                <Feather name="package" size={23} color={style.colors.primary} />
+
+                                <Text style={styles.productsTitle}>Prodotti presenti</Text>
+                            </View>
+
+                            <Text style={styles.productsCount}>
+                                {countProducts} {countProducts === 1 ? "prodotto" : "prodotti"}
+                            </Text>
+                        </View>
+
+                        {/* FILTRI */}
+                        <Filters
+                            search={searchProduct}
+                            onChangeSearch={setSearchProduct}
+                            sortName={sortName}
+                            onSortNameChange={setSortName}
+                            sortQuantity={sortQuantity}
+                            onSortQuantityChange={setSortQuantity}
+                        />
+
+                        {pantryProducts.length > 0 ? (
+                            sortedProducts.length > 0 ? (
+                                sortedProducts.map((p) => (
+                                    <ProductCard
+                                        key={p.item_id}
+                                        product={p}
+                                        onPress={() => handleOpenDetail(p.item_id)}
+                                        onPressMenu={() => handleOpenMenu(p.item_id)}
+                                    />
+                                ))
+                            ) : (
+                                <Text>Nessun prodotto trovatp</Text>
+                            )) : (
+                            <Text>Nessun prodotto presente</Text>
+                        )}
+
+                        <Pressable
+                            onPress={() => setIsOpenManageMemberModals(true)}
+                            style={styles.membersButton}>
+                            <FontAwesome5 name="user-friends" size={18} color={style.colors.surface} />
+                            <Text style={styles.memberButtonText}>Gestisci membri</Text>
+                        </Pressable>
                     </View>
-
-                    {/* FILTRI */}
-                    <Filters
-                        search={searchProduct}
-                        onChangeSearch={setSearchProduct}
-                        sortName={sortName}
-                        onSortNameChange={setSortName}
-                        sortQuantity={sortQuantity}
-                        onSortQuantityChange={setSortQuantity}
-                    />
-
-                    {pantryProducts.length > 0 ? (
-                        sortedProducts.length > 0 ? (
-                            sortedProducts.map((p) => (
-                                <ProductCard
-                                    key={p.item_id}
-                                    product={p}
-                                    onPress={() => handleOpenDetail(p.item_id)}
-                                    onPressMenu={() => handleOpenMenu(p.item_id)}
-                                />
-                            ))
-                        ) : (
-                            <Text>Nessun prodotto trovatp</Text>
-                        )) : (
-                        <Text>Nessun prodotto presente</Text>
-                    )}
-
-                    <Pressable
-                        onPress={() => setIsOpenManageMemberModals(true)}
-                        style={styles.membersButton}>
-                        <FontAwesome5 name="user-friends" size={18} color={style.colors.surface} />
-                        <Text style={styles.memberButtonText}>Gestisci membri</Text>
-                    </Pressable>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </SafeAreaView>
 
             {/* modale gestione membri */}
             {actualPantry && (
@@ -304,12 +308,6 @@ const styles = StyleSheet.create({
         borderRadius: style.radius.circle,
         alignItems: "center",
         justifyContent: "center",
-
-        shadowColor: style.colors.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2
     },
     pantryHeader: {
         padding: style.spacing.md,
@@ -365,7 +363,7 @@ const styles = StyleSheet.create({
     membersButton: {
         backgroundColor: style.colors.primary,
         borderRadius: style.radius.stats,
-        marginTop: style.spacing.md,
+        marginTop: style.spacing.sm,
         paddingVertical: style.spacing.md,
         flexDirection: "row",
         justifyContent: "center",

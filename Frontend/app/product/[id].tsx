@@ -4,6 +4,8 @@ import { ScrollView, View, Text, Image, StyleSheet, Pressable } from "react-nati
 // navigazione app
 import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 // stili
 import { style } from "../../styles/generics";
 
@@ -41,147 +43,149 @@ export default function DettaglioProdotto() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.headerActions}>
-          <Pressable
-            onPress={() => router.replace(`/pantry/${pantryId}`)}
-            style={styles.actionButtons}>
-            <FontAwesome6 name="chevron-left" size={20} color={style.colors.primary} />
-          </Pressable>
-        </View>
-
-        <View style={styles.imageContainer}>
-          <Image
-            source={
-              product?.image_url ? { uri: product?.image_url } : placeholder
-            }
-            style={styles.image}
-            resizeMode="cover"
-          />
-        </View>
-
-        <View style={styles.productDetails}>
-
-          <View style={styles.separator} />
-
-          <Text style={styles.title}>{product?.name}</Text>
-
-          <View style={styles.mainInfoContainer}>
-            <Text style={styles.mainInfoTitle}>Informazioni principali</Text>
-
-            <View style={styles.mainInfo}>
-              <View style={styles.infoProduct}>
-                <Text style={styles.label}>Scadenza:</Text>
-
-                <Text style={[styles.badgeText, { color: badge.color }]}>{badge.text}</Text>
-              </View>
-
-              <View style={styles.infoSeparator} />
-
-              <View style={styles.infoProduct}>
-                <Text style={styles.label}>Quantità:</Text>
-                <Text style={styles.value}>{product?.quantity}</Text>
-              </View>
-
-              <View style={styles.infoSeparator} />
-
-              <View style={styles.infoProduct}>
-                <Text style={styles.label}>Aggiunto il:</Text>
-                <Text style={styles.value}>
-                  {product?.added_at
-                    ? product.added_at.split("T")[0].split("-").reverse().join("/")
-                    : "-"}
-                </Text>
-              </View>
-
-              <View style={styles.infoSeparator} />
-
-              <View style={styles.infoProduct}>
-                <Text style={styles.label}>Marca:</Text>
-                <Text style={styles.value}>{product?.brand ?? "0"}</Text>
-              </View>
-            </View>
+      <SafeAreaView style={{ flex: 1, backgroundColor: style.colors.background }}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={() => router.replace(`/pantry/${pantryId}`)}
+              style={styles.actionButtons}>
+              <FontAwesome6 name="chevron-left" size={20} color={style.colors.primary} />
+            </Pressable>
           </View>
 
-          <View style={styles.ingredientsContainer}>
-            <Text style={styles.ingredientsTitle}>Ingredienti:</Text>
-            <Text style={styles.ingredientsText}>
-              {formattedIngredients(product?.ingredients || "") || "Non disponibili"}
-            </Text>
+          <View style={styles.imageContainer}>
+            <Image
+              source={
+                product?.image_url ? { uri: product?.image_url } : placeholder
+              }
+              style={styles.image}
+              resizeMode="cover"
+            />
           </View>
 
+          <View style={styles.productDetails}>
 
-          {product?.nutrition && (
-            <View style={styles.nutritionContainer}>
-              <View style={styles.nutritionHeader}>
-                <Text style={styles.nutritionTitle}>Valori Nutrizionali</Text>
-                <Text style={styles.nutritionSubtitle}>(per 100g)</Text>
-              </View>
+            <View style={styles.separator} />
 
-              <View style={styles.nutritionCard}>
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Energia</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.energy_kcal ?? "0"} kcal</Text>
+            <Text style={styles.title}>{product?.name}</Text>
+
+            <View style={styles.mainInfoContainer}>
+              <Text style={styles.mainInfoTitle}>Informazioni principali</Text>
+
+              <View style={styles.mainInfo}>
+                <View style={styles.infoProduct}>
+                  <Text style={styles.label}>Scadenza:</Text>
+
+                  <Text style={[styles.badgeText, { color: badge.color }]}>{badge.text}</Text>
                 </View>
 
                 <View style={styles.infoSeparator} />
 
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Grassi</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.fat ?? "0"} g</Text>
+                <View style={styles.infoProduct}>
+                  <Text style={styles.label}>Quantità:</Text>
+                  <Text style={styles.value}>{product?.quantity}</Text>
                 </View>
 
                 <View style={styles.infoSeparator} />
 
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>
-                    Di cui acidi grassi saturi
+                <View style={styles.infoProduct}>
+                  <Text style={styles.label}>Aggiunto il:</Text>
+                  <Text style={styles.value}>
+                    {product?.added_at
+                      ? product.added_at.split("T")[0].split("-").reverse().join("/")
+                      : "-"}
                   </Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.saturated_fat ?? "0"} g</Text>
                 </View>
 
                 <View style={styles.infoSeparator} />
 
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Carboidrati</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.carbohydrates ?? "0"} g</Text>
-                </View>
-
-                <View style={styles.infoSeparator} />
-
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Di cui zuccheri</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.sugars ?? "0"} g</Text>
-                </View>
-
-                <View style={styles.infoSeparator} />
-
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Fibre</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.fiber ?? "0"} g</Text>
-                </View>
-
-                <View style={styles.infoSeparator} />
-
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Proteine</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.proteins ?? "0"} g</Text>
-                </View>
-
-                <View style={styles.infoSeparator} />
-
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionLabel}>Sale</Text>
-                  <Text style={styles.nutritionValue}>{product.nutrition.salt ?? "0"} g</Text>
+                <View style={styles.infoProduct}>
+                  <Text style={styles.label}>Marca:</Text>
+                  <Text style={styles.value}>{product?.brand ?? "0"}</Text>
                 </View>
               </View>
             </View>
-          )}
-        </View>
-      </ScrollView>
+
+            <View style={styles.ingredientsContainer}>
+              <Text style={styles.ingredientsTitle}>Ingredienti:</Text>
+              <Text style={styles.ingredientsText}>
+                {formattedIngredients(product?.ingredients || "") || "Non disponibili"}
+              </Text>
+            </View>
+
+
+            {product?.nutrition && (
+              <View style={styles.nutritionContainer}>
+                <View style={styles.nutritionHeader}>
+                  <Text style={styles.nutritionTitle}>Valori Nutrizionali</Text>
+                  <Text style={styles.nutritionSubtitle}>(per 100g)</Text>
+                </View>
+
+                <View style={styles.nutritionCard}>
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Energia</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.energy_kcal ?? "0"} kcal</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Grassi</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.fat ?? "0"} g</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>
+                      Di cui acidi grassi saturi
+                    </Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.saturated_fat ?? "0"} g</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Carboidrati</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.carbohydrates ?? "0"} g</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Di cui zuccheri</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.sugars ?? "0"} g</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Fibre</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.fiber ?? "0"} g</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Proteine</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.proteins ?? "0"} g</Text>
+                  </View>
+
+                  <View style={styles.infoSeparator} />
+
+                  <View style={styles.nutritionRow}>
+                    <Text style={styles.nutritionLabel}>Sale</Text>
+                    <Text style={styles.nutritionValue}>{product.nutrition.salt ?? "0"} g</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </>
   );
 }
@@ -210,12 +214,6 @@ const styles = StyleSheet.create({
     borderRadius: style.radius.circle,
     alignItems: "center",
     justifyContent: "center",
-
-    shadowColor: style.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2
   },
   imageContainer: {
     alignItems: "center",
