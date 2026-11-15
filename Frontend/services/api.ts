@@ -1,6 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
-
+import { getStorageItem } from './storage';
 
 const API = process.env.EXPO_PUBLIC_API_URL
     ? process.env.EXPO_PUBLIC_API_URL.trim()
@@ -8,12 +6,7 @@ const API = process.env.EXPO_PUBLIC_API_URL
 
 //funzione di supporto per avere il token    
 export async function getToken() {
-
-    if (Platform.OS === 'web') { //condizione per testare dal web
-        return localStorage.getItem("token");
-    } else { //secureStore funziona solo da mobile
-        return await SecureStore.getItemAsync("token");
-    }
+    return await getStorageItem("token");
 }
 
 //funzione di supporto per autenticazione
