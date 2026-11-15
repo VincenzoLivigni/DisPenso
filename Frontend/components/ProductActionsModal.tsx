@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         minHeight: style.controls.minimumTouchTarget,
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: style.radius.modal,
+        borderRadius: style.radius.stats,
         backgroundColor: style.colors.background
     },
     editText: {
@@ -125,6 +125,9 @@ const styles = StyleSheet.create({
     },
     deleteOption: {
         minHeight: style.controls.minimumTouchTarget,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: style.radius.stats,
         backgroundColor: style.colors.background
     },
     deleteText: {
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
         minHeight: style.controls.minimumTouchTarget,
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: style.radius.modal,
+        borderRadius: style.radius.stats,
         backgroundColor: style.colors.background,
     },
     cancelText: {

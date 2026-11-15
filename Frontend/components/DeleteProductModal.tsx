@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     deleteButton: {
         minHeight: style.controls.minimumTouchTarget,
         backgroundColor: style.colors.error,
-        borderRadius: style.radius.modal,
+        borderRadius: style.radius.stats,
         justifyContent: "center",
         alignItems: 'center',
         flex: 1,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     nullButton: {
         minHeight: style.controls.minimumTouchTarget,
         backgroundColor: style.colors.null,
-        borderRadius: style.radius.modal,
+        borderRadius: style.radius.stats,
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,

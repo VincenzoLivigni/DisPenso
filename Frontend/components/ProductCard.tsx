@@ -67,15 +67,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: style.colors.border,
         borderRadius: style.radius.stats,
+        marginBottom: style.spacing.xs,
         padding: style.spacing.sm,
         flexDirection: "row",
         alignItems: "center",
-
-        shadowColor: style.colors.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2
     },
     image: {
         minWidth: 70,
@@ -112,11 +107,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         alignSelf: "flex-start",
-
-        shadowColor: style.colors.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2
     },
 });

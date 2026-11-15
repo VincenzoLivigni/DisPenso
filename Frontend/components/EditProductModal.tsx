@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         color: style.colors.text,
         borderWidth: 1,
         borderColor: style.colors.border,
-        borderRadius: style.radius.card,
+        borderRadius: style.radius.stats,
         paddingHorizontal: style.spacing.md,
     },
     actionsContainer: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     saveButton: {
         minHeight: style.controls.minimumTouchTarget,
         backgroundColor: style.colors.green,
-        borderRadius: style.radius.modal,
+        borderRadius: style.radius.stats,
         justifyContent: "center",
         alignItems: 'center',
         flex: 1,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     nullButton: {
         minHeight: style.controls.minimumTouchTarget,
         backgroundColor: style.colors.null,
-        borderRadius: style.radius.modal,
+        borderRadius: style.radius.stats,
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,

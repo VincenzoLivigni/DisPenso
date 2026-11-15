@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
     color: style.colors.textSecondary,
     paddingHorizontal: style.spacing.sm
   },
-
   inviteCodeContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -202,14 +201,18 @@ const styles = StyleSheet.create({
   },
   sectionRow: {
     height: style.controls.inputHeight,
+    fontSize: style.fontSize.md,
     backgroundColor: style.colors.background,
+    color: style.colors.text,
+    borderWidth: 1,
+    borderColor: style.colors.border,
     paddingHorizontal: style.spacing.md,
-    paddingVertical: style.spacing.md,
-    borderRadius: style.radius.card,
+    borderRadius: style.radius.stats,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     gap: style.spacing.sm,
+    marginBottom: style.spacing.sm
   },
   users: {
     fontSize: style.fontSize.md,
@@ -249,14 +252,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerButtons: {
-    marginTop: style.spacing.lg,
+    marginTop: style.spacing.xs,
     flexDirection: "row",
     gap: style.spacing.sm,
   },
   deleteButton: {
     minHeight: style.controls.minimumTouchTarget,
     backgroundColor: style.colors.error,
-    borderRadius: style.radius.modal,
+    borderRadius: style.radius.stats,
     justifyContent: "center",
     alignItems: 'center',
     flex: 1,
@@ -264,7 +267,7 @@ const styles = StyleSheet.create({
   nullButton: {
     minHeight: style.controls.minimumTouchTarget,
     backgroundColor: style.colors.null,
-    borderRadius: style.radius.modal,
+    borderRadius: style.radius.stats,
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
